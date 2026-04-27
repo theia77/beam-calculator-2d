@@ -1,7 +1,19 @@
-export default function ControlPanel({ pointLoad, setPointLoad, udlLoad, setUdlLoad, beamLength }) {
+export default function ControlPanel({ beamType, setBeamType, pointLoad, setPointLoad, udlLoad, setUdlLoad, beamLength }) {
   return (
     <div className="control-panel">
       <h3>Controls</h3>
+
+      <div className="control-group">
+        <label>Beam Type</label>
+        <select
+          value={beamType}
+          onChange={(e) => setBeamType(e.target.value)}
+          style={{ width: '100%', padding: '5px', marginBottom: '10px' }}
+        >
+          <option value="simply_supported">Simply Supported</option>
+          <option value="cantilever">Cantilever (Fixed Left)</option>
+        </select>
+      </div>
 
       {/* Point Load Controls */}
       <div className="control-group">

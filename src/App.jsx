@@ -5,26 +5,26 @@ import ChartBMD from './components/ChartBMD';
 import { generatePlotData } from './core/superposition';
 
 export default function App() {
-  const beamLength = 10; // Fixed 10m beam
+  const beamLength = 10;
 
-  // The application state holding our loads
+  const [beamType, setBeamType] = useState('simply_supported');
   const [pointLoad, setPointLoad] = useState({ active: true, mag: 50, pos: 5 });
   const [udlLoad, setUdlLoad] = useState({ active: false, mag: 10, start: 2, end: 8 });
 
-  // useMemo ensures we only recalculate the math when the sliders move
   const plotData = useMemo(() => {
     const activeLoads = [];
     if (pointLoad.active) activeLoads.push({ type: 'point', ...pointLoad });
     if (udlLoad.active) activeLoads.push({ type: 'udl', ...udlLoad });
 
-    return generatePlotData(beamLength, activeLoads);
-  }, [pointLoad, udlLoad]);
+    return generatePlotData(beamLength, activeLoads, beamType);
+  }, [pointLoad, udlLoad, beamType]);
 
   return (
     <div className="app-container">
-      <h2>Interactive Beam Calculator (Macaulay's Method)</h2>
+      <h2>Interactive Beam Calculator</h2>
       <div className="dashboard">
         <ControlPanel
+          beamType={beamType} setBeamType={setBeamType}
           pointLoad={pointLoad} setPointLoad={setPointLoad}
           udlLoad={udlLoad} setUdlLoad={setUdlLoad}
           beamLength={beamLength}
