@@ -1,5 +1,3 @@
-// Macaulay Bracket Helper Function
-// Returns 0 if x < a. If x >= a, returns (x-a)^power
 function mac(x, a, power) {
   if (x < a) return 0;
   if (power === 0) return 1;

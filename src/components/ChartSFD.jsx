@@ -12,7 +12,7 @@ export default function ChartSFD({ data }) {
             <YAxis />
             <Tooltip />
             <ReferenceLine y={0} stroke="#000" />
-            {/* Linear rendering keeps UDL shear slopes visible. */}
+            {/* Changed from stepAfter to linear to fix UDL slopes. */}
             <Area type="linear" dataKey="shear" stroke="#2563eb" fill="#3b82f6" fillOpacity={0.3} />
           </AreaChart>
         </ResponsiveContainer>
