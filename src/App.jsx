@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import ControlPanel from './components/ControlPanel';
 import ChartSFD from './components/ChartSFD';
 import ChartBMD from './components/ChartBMD';
+import ChartBendingStress from './components/ChartBendingStress';
 import { generatePlotData } from './core/superposition';
 import { materials, sections } from './core/beamData';
 
@@ -30,13 +31,12 @@ export default function App() {
 
   return (
     <div className="app-container">
-      <h2>Interactive Beam Calculator</h2>
+      <h2>Question: Structural Problem Setup</h2>
       <div className="dashboard">
         <ControlPanel
           beamLength={beamLength} setBeamLength={setBeamLength}
           supportA={supportA} setSupportA={setSupportA}
           supportB={supportB} setSupportB={setSupportB}
-          reactions={reactions}
           material={material} setMaterial={setMaterial}
           section={section} setSection={setSection}
           pointLoad={pointLoad} setPointLoad={setPointLoad}
@@ -44,10 +44,19 @@ export default function App() {
           uvlLoad={uvlLoad} setUvlLoad={setUvlLoad}
           momentLoad={momentLoad} setMomentLoad={setMomentLoad}
         />
-        <div className="chart-section">
-          <ChartSFD data={plotData} />
-          <ChartBMD data={plotData} />
+        <div className="chart-section" style={{ border: '2px dashed #cbd5e1', borderRadius: '8px', padding: '20px', background: '#f8fafc' }}>
+          <h4>Graphical Question View</h4>
+          <p style={{ color: '#64748b' }}>BeamSetupView.jsx will be added here to draw the beam with supports and loads.</p>
         </div>
+      </div>
+
+      <div style={{ margin: '40px 0', borderTop: '2px solid #e2e8f0' }}></div>
+
+      <h2>Answer: Design Performance Limits</h2>
+      <div className="chart-section">
+        <ChartSFD data={plotData} />
+        <ChartBMD data={plotData} />
+        <ChartBendingStress data={plotData} material={material} section={section} />
       </div>
     </div>
   );

@@ -4,7 +4,6 @@ export default function ControlPanel({
   beamLength, setBeamLength,
   supportA, setSupportA,
   supportB, setSupportB,
-  reactions,
   material, setMaterial,
   section, setSection,
   pointLoad, setPointLoad,
@@ -14,42 +13,35 @@ export default function ControlPanel({
 }) {
   return (
     <div className="control-panel">
-      <h3>Controls</h3>
+      <h3>Controls (Problem Setup)</h3>
+
+      {/* Design Parameters */}
+      <div className="control-group">
+        <label>Material: {material.label}</label>
+        <select style={{ width: '100%', padding: '5px', marginBottom: '8px' }}
+          value={material.id}
+          onChange={(e) => setMaterial(materials.find(m => m.id === e.target.value))}>
+          {materials.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
+        </select>
+        <label>Section: {section.label}</label>
+        <select style={{ width: '100%', padding: '5px' }}
+          value={section.id}
+          onChange={(e) => setSection(sections.find(s => s.id === e.target.value))}>
+          {sections.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+        </select>
+      </div>
 
       {/* Beam & Supports */}
       <div className="control-group">
         <label>Total Beam Length: {beamLength} m</label>
         <input type="range" min="5" max="30" step="1" value={beamLength}
           onChange={(e) => setBeamLength(Number(e.target.value))} />
-
         <label>Support A Position: {supportA} m</label>
         <input type="range" min="0" max={supportB - 0.1} step="0.1" value={supportA}
           onChange={(e) => setSupportA(Number(e.target.value))} />
-
         <label>Support B Position: {supportB} m</label>
         <input type="range" min={supportA + 0.1} max={beamLength} step="0.1" value={supportB}
           onChange={(e) => setSupportB(Number(e.target.value))} />
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '15px', padding: '10px', background: '#e2e8f0', borderRadius: '6px' }}>
-          <span><b>R<sub>A</sub></b> = {reactions.rA.toFixed(2)} kN</span>
-          <span><b>R<sub>B</sub></b> = {reactions.rB.toFixed(2)} kN</span>
-        </div>
-      </div>
-
-      {/* Material & Section */}
-      <div className="control-group">
-        <label>Material</label>
-        <select style={{ width: '100%', padding: '5px', marginBottom: '8px' }}
-          value={material.id}
-          onChange={(e) => setMaterial(materials.find(m => m.id === e.target.value))}>
-          {materials.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
-        </select>
-        <label>Cross Section</label>
-        <select style={{ width: '100%', padding: '5px' }}
-          value={section.id}
-          onChange={(e) => setSection(sections.find(s => s.id === e.target.value))}>
-          {sections.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
-        </select>
       </div>
 
       {/* Point Load */}
