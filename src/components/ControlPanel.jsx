@@ -1,10 +1,11 @@
 export default function ControlPanel({
   beamLength, setBeamLength,
-  beamType, setBeamType,
+  supportA, setSupportA,
+  supportB, setSupportB,
   pointLoad, setPointLoad,
   udlLoad, setUdlLoad,
-  uvlLoad, setUvlLoad,
-  momentLoad, setMomentLoad
+  momentLoad, setMomentLoad,
+  reactions
 }) {
   return (
     <div className="control-panel">
@@ -20,18 +21,31 @@ export default function ControlPanel({
         />
       </div>
 
-      {/* Beam Type */}
+      {/* Support Positions */}
       <div className="control-group">
-        <label>Beam Type</label>
-        <select
-          value={beamType}
-          onChange={(e) => setBeamType(e.target.value)}
-          style={{ width: '100%', padding: '5px', marginBottom: '10px' }}
-        >
-          <option value="simply_supported">Simply Supported</option>
-          <option value="cantilever">Cantilever (Fixed Left)</option>
-        </select>
+        <label>Support A Position: {supportA} m</label>
+        <input
+          type="range" min="0" max={supportB - 1} step="0.1"
+          value={supportA}
+          onChange={(e) => setSupportA(Number(e.target.value))}
+        />
+        <label>Support B Position: {supportB} m</label>
+        <input
+          type="range" min={supportA + 1} max={beamLength} step="0.1"
+          value={supportB}
+          onChange={(e) => setSupportB(Number(e.target.value))}
+        />
       </div>
+
+      {/* Reactions Display */}
+      {reactions && (
+        <div className="control-group" style={{ background: '#f8fafc', borderRadius: '6px', padding: '8px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+            <span>R<sub>A</sub> = <strong>{reactions.rA.toFixed(2)} kN</strong></span>
+            <span>R<sub>B</sub> = <strong>{reactions.rB.toFixed(2)} kN</strong></span>
+          </div>
+        </div>
+      )}
 
       {/* Point Load */}
       <div className="control-group">
@@ -42,8 +56,8 @@ export default function ControlPanel({
         </label>
         {pointLoad.active && (
           <>
-            <label>Magnitude: {pointLoad.mag} kN</label>
-            <input type="range" min="0" max="100" value={pointLoad.mag}
+            <label>Magnitude: {pointLoad.mag} kN (Negative = Upward)</label>
+            <input type="range" min="-100" max="100" value={pointLoad.mag}
               onChange={(e) => setPointLoad({ ...pointLoad, mag: Number(e.target.value) })} />
             <label>Position: {pointLoad.pos} m</label>
             <input type="range" min="0" max={beamLength} step="0.1" value={pointLoad.pos}
@@ -70,28 +84,6 @@ export default function ControlPanel({
             <label>End Pos: {udlLoad.end} m</label>
             <input type="range" min={udlLoad.start + 0.1} max={beamLength} step="0.1" value={udlLoad.end}
               onChange={(e) => setUdlLoad({ ...udlLoad, end: Number(e.target.value) })} />
-          </>
-        )}
-      </div>
-
-      {/* UVL (Triangular Load) */}
-      <div className="control-group">
-        <label>
-          <input type="checkbox" checked={uvlLoad.active}
-            onChange={(e) => setUvlLoad({ ...uvlLoad, active: e.target.checked })} />
-          {' '}Triangular Load (UVL)
-        </label>
-        {uvlLoad.active && (
-          <>
-            <label>Peak Magnitude: {uvlLoad.mag} kN/m</label>
-            <input type="range" min="0" max="50" value={uvlLoad.mag}
-              onChange={(e) => setUvlLoad({ ...uvlLoad, mag: Number(e.target.value) })} />
-            <label>Start Pos (0 kN/m): {uvlLoad.start} m</label>
-            <input type="range" min="0" max={uvlLoad.end - 0.1} step="0.1" value={uvlLoad.start}
-              onChange={(e) => setUvlLoad({ ...uvlLoad, start: Number(e.target.value) })} />
-            <label>End Pos (Peak kN/m): {uvlLoad.end} m</label>
-            <input type="range" min={uvlLoad.start + 0.1} max={beamLength} step="0.1" value={uvlLoad.end}
-              onChange={(e) => setUvlLoad({ ...uvlLoad, end: Number(e.target.value) })} />
           </>
         )}
       </div>

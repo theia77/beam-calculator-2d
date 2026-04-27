@@ -4,73 +4,53 @@ function mac(x, a, power) {
   return Math.pow(x - a, power);
 }
 
-export function calcPointLoad(x, L, mag, pos, beamType) {
-  let R1 = 0; let M_wall = 0;
-  if (beamType === 'simply_supported') {
-    R1 = mag * (L - pos) / L;
-  } else if (beamType === 'cantilever') {
-    R1 = mag;
-    M_wall = -mag * pos;
-  }
-  const shear = R1 - (mag * mac(x, pos, 0));
-  const moment = M_wall + (R1 * x) - (mag * mac(x, pos, 1));
-  return { shear, moment };
+export function solveReactions(L, loads, xA, xB) {
+  const span = xB - xA;
+  if (span === 0) return { rA: 0, rB: 0 };
+
+  let totalMomentAboutA = 0;
+  let totalVerticalForce = 0;
+
+  loads.forEach(load => {
+    if (load.type === 'point') {
+      const force = load.mag;
+      const arm = load.pos - xA;
+      totalVerticalForce += force;
+      totalMomentAboutA += force * arm;
+    } else if (load.type === 'udl') {
+      const force = load.mag * (load.end - load.start);
+      const arm = (load.start + (load.end - load.start) / 2) - xA;
+      totalVerticalForce += force;
+      totalMomentAboutA += force * arm;
+    } else if (load.type === 'moment') {
+      totalMomentAboutA += load.mag;
+    }
+  });
+
+  const rB = totalMomentAboutA / span;
+  const rA = totalVerticalForce - rB;
+
+  return { rA, rB };
 }
 
-export function calcUDL(x, L, mag, start, end, beamType) {
-  let R1 = 0; let M_wall = 0;
-  const totalForce = mag * (end - start);
-  const centerOfForce = start + ((end - start) / 2);
-  if (beamType === 'simply_supported') {
-    R1 = totalForce * (L - centerOfForce) / L;
-  } else if (beamType === 'cantilever') {
-    R1 = totalForce;
-    M_wall = -totalForce * centerOfForce;
-  }
-  const shear = R1 - (mag * mac(x, start, 1)) + (mag * mac(x, end, 1));
-  const moment = M_wall + (R1 * x) - ((mag / 2) * mac(x, start, 2)) + ((mag / 2) * mac(x, end, 2));
-  return { shear, moment };
-}
+export function calculateInternalForces(x, L, loads, xA, xB, rA, rB) {
+  let shear = rA * mac(x, xA, 0);
+  let moment = rA * mac(x, xA, 1);
 
-export function calcUVL(x, L, mag, start, end, beamType) {
-  const length = end - start;
-  if (length === 0) return { shear: 0, moment: 0 };
+  shear += rB * mac(x, xB, 0);
+  moment += rB * mac(x, xB, 1);
 
-  const k = mag / length;
-  const totalForce = 0.5 * mag * length;
-  const centerOfForce = start + (length * (2 / 3));
+  loads.forEach(load => {
+    if (load.type === 'point') {
+      shear -= load.mag * mac(x, load.pos, 0);
+      moment -= load.mag * mac(x, load.pos, 1);
+    } else if (load.type === 'udl') {
+      shear -= load.mag * mac(x, load.start, 1) - load.mag * mac(x, load.end, 1);
+      moment -= (load.mag / 2) * mac(x, load.start, 2) - (load.mag / 2) * mac(x, load.end, 2);
+    } else if (load.type === 'moment') {
+      moment -= load.mag * mac(x, load.pos, 0);
+    }
+  });
 
-  let R1 = 0; let M_wall = 0;
-  if (beamType === 'simply_supported') {
-    R1 = totalForce * (L - centerOfForce) / L;
-  } else if (beamType === 'cantilever') {
-    R1 = totalForce;
-    M_wall = -totalForce * centerOfForce;
-  }
-
-  const shear = R1
-    - (k / 2) * mac(x, start, 2)
-    + (k / 2) * mac(x, end, 2)
-    + mag * mac(x, end, 1);
-
-  const moment = M_wall + (R1 * x)
-    - (k / 6) * mac(x, start, 3)
-    + (k / 6) * mac(x, end, 3)
-    + (mag / 2) * mac(x, end, 2);
-
-  return { shear, moment };
-}
-
-export function calcMomentLoad(x, L, mag, pos, beamType) {
-  let R1 = 0;
-  let M_wall = 0;
-  if (beamType === 'simply_supported') {
-    R1 = -mag / L;
-  } else if (beamType === 'cantilever') {
-    R1 = 0;
-    M_wall = -mag;
-  }
-  const shear = R1;
-  const moment = M_wall + (R1 * x) + (mag * mac(x, pos, 0));
   return { shear, moment };
 }
