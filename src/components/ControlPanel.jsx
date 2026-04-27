@@ -3,7 +3,6 @@ export default function ControlPanel({ beamType, setBeamType, pointLoad, setPoin
     <div className="control-panel">
       <h3>Controls</h3>
 
-      {/* NEW: Beam Selection Dropdown */}
       <div className="control-group">
         <label>Beam Type</label>
         <select
@@ -16,7 +15,6 @@ export default function ControlPanel({ beamType, setBeamType, pointLoad, setPoin
         </select>
       </div>
 
-      {/* Point Load Controls */}
       <div className="control-group">
         <label>
           <input
@@ -40,7 +38,6 @@ export default function ControlPanel({ beamType, setBeamType, pointLoad, setPoin
         )}
       </div>
 
-      {/* UDL Controls */}
       <div className="control-group">
         <label>
           <input
