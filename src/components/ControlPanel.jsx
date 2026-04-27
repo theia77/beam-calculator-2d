@@ -1,4 +1,10 @@
-export default function ControlPanel({ beamType, setBeamType, pointLoad, setPointLoad, udlLoad, setUdlLoad, beamLength }) {
+export default function ControlPanel({
+  beamType, setBeamType,
+  pointLoad, setPointLoad,
+  udlLoad, setUdlLoad,
+  uvlLoad, setUvlLoad,
+  beamLength
+}) {
   return (
     <div className="control-panel">
       <h3>Controls</h3>
@@ -15,22 +21,18 @@ export default function ControlPanel({ beamType, setBeamType, pointLoad, setPoin
         </select>
       </div>
 
+      {/* Point Load */}
       <div className="control-group">
         <label>
-          <input
-            type="checkbox"
-            checked={pointLoad.active}
-            onChange={(e) => setPointLoad({ ...pointLoad, active: e.target.checked })}
-          />
-          Point Load
+          <input type="checkbox" checked={pointLoad.active}
+            onChange={(e) => setPointLoad({ ...pointLoad, active: e.target.checked })} />
+          {' '}Point Load
         </label>
-
         {pointLoad.active && (
           <>
             <label>Magnitude: {pointLoad.mag} kN</label>
             <input type="range" min="0" max="100" value={pointLoad.mag}
               onChange={(e) => setPointLoad({ ...pointLoad, mag: Number(e.target.value) })} />
-
             <label>Position: {pointLoad.pos} m</label>
             <input type="range" min="0" max={beamLength} step="0.1" value={pointLoad.pos}
               onChange={(e) => setPointLoad({ ...pointLoad, pos: Number(e.target.value) })} />
@@ -38,32 +40,50 @@ export default function ControlPanel({ beamType, setBeamType, pointLoad, setPoin
         )}
       </div>
 
+      {/* UDL */}
       <div className="control-group">
         <label>
-          <input
-            type="checkbox"
-            checked={udlLoad.active}
-            onChange={(e) => setUdlLoad({ ...udlLoad, active: e.target.checked })}
-          />
-          Uniform Distributed Load (UDL)
+          <input type="checkbox" checked={udlLoad.active}
+            onChange={(e) => setUdlLoad({ ...udlLoad, active: e.target.checked })} />
+          {' '}Uniform Load (UDL)
         </label>
-
         {udlLoad.active && (
           <>
             <label>Magnitude: {udlLoad.mag} kN/m</label>
             <input type="range" min="0" max="50" value={udlLoad.mag}
               onChange={(e) => setUdlLoad({ ...udlLoad, mag: Number(e.target.value) })} />
-
             <label>Start Pos: {udlLoad.start} m</label>
-            <input type="range" min="0" max={udlLoad.end} step="0.1" value={udlLoad.start}
+            <input type="range" min="0" max={udlLoad.end - 0.1} step="0.1" value={udlLoad.start}
               onChange={(e) => setUdlLoad({ ...udlLoad, start: Number(e.target.value) })} />
-
             <label>End Pos: {udlLoad.end} m</label>
-            <input type="range" min={udlLoad.start} max={beamLength} step="0.1" value={udlLoad.end}
+            <input type="range" min={udlLoad.start + 0.1} max={beamLength} step="0.1" value={udlLoad.end}
               onChange={(e) => setUdlLoad({ ...udlLoad, end: Number(e.target.value) })} />
           </>
         )}
       </div>
+
+      {/* UVL (Triangular Load) */}
+      <div className="control-group">
+        <label>
+          <input type="checkbox" checked={uvlLoad.active}
+            onChange={(e) => setUvlLoad({ ...uvlLoad, active: e.target.checked })} />
+          {' '}Triangular Load (UVL)
+        </label>
+        {uvlLoad.active && (
+          <>
+            <label>Peak Magnitude: {uvlLoad.mag} kN/m</label>
+            <input type="range" min="0" max="50" value={uvlLoad.mag}
+              onChange={(e) => setUvlLoad({ ...uvlLoad, mag: Number(e.target.value) })} />
+            <label>Start Pos (0 kN/m): {uvlLoad.start} m</label>
+            <input type="range" min="0" max={uvlLoad.end - 0.1} step="0.1" value={uvlLoad.start}
+              onChange={(e) => setUvlLoad({ ...uvlLoad, start: Number(e.target.value) })} />
+            <label>End Pos (Peak kN/m): {uvlLoad.end} m</label>
+            <input type="range" min={uvlLoad.start + 0.1} max={beamLength} step="0.1" value={uvlLoad.end}
+              onChange={(e) => setUvlLoad({ ...uvlLoad, end: Number(e.target.value) })} />
+          </>
+        )}
+      </div>
+
     </div>
   );
 }

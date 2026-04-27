@@ -1,4 +1,4 @@
-import { calcPointLoad, calcUDL } from './beamMath';
+import { calcPointLoad, calcUDL, calcUVL } from './beamMath';
 
 export function generatePlotData(beamLength, loads, beamType) {
   const steps = 100;
@@ -17,6 +17,8 @@ export function generatePlotData(beamLength, loads, beamType) {
         result = calcPointLoad(x, beamLength, load.mag, load.pos, beamType);
       } else if (load.type === 'udl') {
         result = calcUDL(x, beamLength, load.mag, load.start, load.end, beamType);
+      } else if (load.type === 'uvl') {
+        result = calcUVL(x, beamLength, load.mag, load.start, load.end, beamType);
       }
 
       totalShear += result.shear;
@@ -24,7 +26,7 @@ export function generatePlotData(beamLength, loads, beamType) {
     });
 
     data.push({
-      x: x,
+      x,
       shear: Math.round(totalShear * 100) / 100,
       moment: Math.round(totalMoment * 100) / 100
     });
