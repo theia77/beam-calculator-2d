@@ -1,0 +1,114 @@
+export default function BeamSetupView({
+  beamLength, supportA, supportB,
+  pointLoad, udlLoad, uvlLoad, momentLoad
+}) {
+  const SVG_WIDTH = 800;
+  const PADDING = 100;
+  const Y_BEAM = 150;
+
+  const scaleX = (x) => PADDING + (x / beamLength) * SVG_WIDTH;
+
+  return (
+    <div style={{ width: '100%', overflowX: 'auto', background: 'white', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+      <svg viewBox="0 0 1000 300" style={{ width: '100%', minWidth: '600px', display: 'block' }}>
+
+        {/* Background Grid */}
+        <defs>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#f1f5f9" strokeWidth="1"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        {/* Beam */}
+        <rect
+          x={scaleX(0)} y={Y_BEAM - 10}
+          width={SVG_WIDTH} height={20}
+          fill="#3b82f6" stroke="#1d4ed8" strokeWidth="2" rx="4"
+        />
+
+        {/* Support A — Pin (Triangle) */}
+        <polygon
+          points={`${scaleX(supportA)},${Y_BEAM + 10} ${scaleX(supportA) - 15},${Y_BEAM + 40} ${scaleX(supportA) + 15},${Y_BEAM + 40}`}
+          fill="#64748b" stroke="#475569" strokeWidth="2"
+        />
+        <text x={scaleX(supportA)} y={Y_BEAM + 60} textAnchor="middle" fontSize="14" fill="#475569" fontWeight="bold">Pin (A)</text>
+
+        {/* Support B — Roller (Circle) */}
+        <circle cx={scaleX(supportB)} cy={Y_BEAM + 25} r="15" fill="#e2e8f0" stroke="#475569" strokeWidth="2" />
+        <circle cx={scaleX(supportB)} cy={Y_BEAM + 25} r="5" fill="#64748b" />
+        <text x={scaleX(supportB)} y={Y_BEAM + 60} textAnchor="middle" fontSize="14" fill="#475569" fontWeight="bold">Roller (B)</text>
+
+        {/* Point Load */}
+        {pointLoad.active && (
+          <g>
+            <line
+              x1={scaleX(pointLoad.pos)} y1={pointLoad.mag >= 0 ? Y_BEAM - 90 : Y_BEAM + 90}
+              x2={scaleX(pointLoad.pos)} y2={pointLoad.mag >= 0 ? Y_BEAM - 15 : Y_BEAM + 15}
+              stroke="#ef4444" strokeWidth="3"
+            />
+            <polygon
+              points={pointLoad.mag >= 0
+                ? `${scaleX(pointLoad.pos)},${Y_BEAM - 10} ${scaleX(pointLoad.pos) - 6},${Y_BEAM - 20} ${scaleX(pointLoad.pos) + 6},${Y_BEAM - 20}`
+                : `${scaleX(pointLoad.pos)},${Y_BEAM + 10} ${scaleX(pointLoad.pos) - 6},${Y_BEAM + 20} ${scaleX(pointLoad.pos) + 6},${Y_BEAM + 20}`
+              }
+              fill="#ef4444"
+            />
+            <text
+              x={scaleX(pointLoad.pos)}
+              y={pointLoad.mag >= 0 ? Y_BEAM - 100 : Y_BEAM + 110}
+              textAnchor="middle" fontSize="14" fill="#ef4444" fontWeight="bold"
+            >
+              {Math.abs(pointLoad.mag)} kN
+            </text>
+          </g>
+        )}
+
+        {/* UDL */}
+        {udlLoad.active && (
+          <g>
+            <rect
+              x={scaleX(udlLoad.start)} y={Y_BEAM - 50}
+              width={scaleX(udlLoad.end) - scaleX(udlLoad.start)} height={40}
+              fill="#ef4444" fillOpacity="0.2" stroke="#ef4444" strokeWidth="2" strokeDasharray="4 4"
+            />
+            <text x={scaleX(udlLoad.start + (udlLoad.end - udlLoad.start) / 2)} y={Y_BEAM - 60} textAnchor="middle" fontSize="14" fill="#ef4444" fontWeight="bold">
+              {udlLoad.mag} kN/m
+            </text>
+          </g>
+        )}
+
+        {/* UVL */}
+        {uvlLoad.active && (
+          <g>
+            <polygon
+              points={`${scaleX(uvlLoad.start)},${Y_BEAM - 10} ${scaleX(uvlLoad.end)},${Y_BEAM - 70} ${scaleX(uvlLoad.end)},${Y_BEAM - 10}`}
+              fill="#f59e0b" fillOpacity="0.3" stroke="#f59e0b" strokeWidth="2"
+            />
+            <text x={scaleX(uvlLoad.end)} y={Y_BEAM - 80} textAnchor="middle" fontSize="14" fill="#d97706" fontWeight="bold">
+              {uvlLoad.mag} kN/m
+            </text>
+          </g>
+        )}
+
+        {/* Applied Moment */}
+        {momentLoad.active && (
+          <g>
+            <path
+              d={`M ${scaleX(momentLoad.pos) - 20} ${Y_BEAM - 30} A 25 25 0 1 1 ${scaleX(momentLoad.pos) + 20} ${Y_BEAM - 30}`}
+              fill="none" stroke="#8b5cf6" strokeWidth="3"
+            />
+            <polygon points={`${scaleX(momentLoad.pos) + 20},${Y_BEAM - 30} ${scaleX(momentLoad.pos) + 15},${Y_BEAM - 40} ${scaleX(momentLoad.pos) + 28},${Y_BEAM - 35}`} fill="#8b5cf6" />
+            <text x={scaleX(momentLoad.pos)} y={Y_BEAM - 65} textAnchor="middle" fontSize="14" fill="#8b5cf6" fontWeight="bold">
+              {Math.abs(momentLoad.mag)} kN·m
+            </text>
+          </g>
+        )}
+
+        {/* Axis Labels */}
+        <text x={scaleX(0)} y={Y_BEAM + 90} textAnchor="middle" fontSize="12" fill="#94a3b8">0 m</text>
+        <text x={scaleX(beamLength)} y={Y_BEAM + 90} textAnchor="middle" fontSize="12" fill="#94a3b8">{beamLength} m</text>
+      </svg>
+    </div>
+  );
+}

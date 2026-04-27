@@ -3,6 +3,7 @@ import ControlPanel from './components/ControlPanel';
 import ChartSFD from './components/ChartSFD';
 import ChartBMD from './components/ChartBMD';
 import ChartBendingStress from './components/ChartBendingStress';
+import BeamSetupView from './components/BeamSetupView';
 import { generatePlotData } from './core/superposition';
 import { materials, sections } from './core/beamData';
 
@@ -45,8 +46,16 @@ export default function App() {
           momentLoad={momentLoad} setMomentLoad={setMomentLoad}
         />
         <div className="chart-section" style={{ border: '2px dashed #cbd5e1', borderRadius: '8px', padding: '20px', background: '#f8fafc' }}>
-          <h4>Graphical Question View</h4>
-          <p style={{ color: '#64748b' }}>BeamSetupView.jsx will be added here to draw the beam with supports and loads.</p>
+          <h4 style={{ marginTop: 0 }}>Graphical Question View</h4>
+          <BeamSetupView
+            beamLength={beamLength}
+            supportA={supportA}
+            supportB={supportB}
+            pointLoad={pointLoad}
+            udlLoad={udlLoad}
+            uvlLoad={uvlLoad}
+            momentLoad={momentLoad}
+          />
         </div>
       </div>
 
