@@ -4,6 +4,7 @@ export default function ControlPanel({
   beamLength, setBeamLength,
   supportA, setSupportA,
   supportB, setSupportB,
+  reactions,
   material, setMaterial,
   section, setSection,
   pointLoad, setPointLoad,
@@ -42,6 +43,13 @@ export default function ControlPanel({
         <label>Support B Position: {supportB} m</label>
         <input type="range" min={supportA + 0.1} max={beamLength} step="0.1" value={supportB}
           onChange={(e) => setSupportB(Number(e.target.value))} />
+
+        {reactions && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px', padding: '10px', background: '#e2e8f0', borderRadius: '6px' }}>
+            <span><b>R<sub>A</sub></b> = {reactions.rA.toFixed(2)} kN</span>
+            <span><b>R<sub>B</sub></b> = {reactions.rB.toFixed(2)} kN</span>
+          </div>
+        )}
       </div>
 
       {/* Point Load */}
