@@ -4,6 +4,7 @@ import ChartSFD from './components/ChartSFD';
 import ChartBMD from './components/ChartBMD';
 import ChartBendingStress from './components/ChartBendingStress';
 import BeamSetupView from './components/BeamSetupView';
+import StressProfileView from './components/StressProfileView';
 import { generatePlotData } from './core/superposition';
 import { materials, sections } from './core/beamData';
 
@@ -79,6 +80,10 @@ export default function App() {
         <ChartSFD data={plotData} />
         <ChartBMD data={plotData} />
         <ChartBendingStress data={plotData} material={material} section={section} />
+        <StressProfileView
+          moment={plotData.reduce((max, d) => Math.abs(d.moment) > Math.abs(max) ? d.moment : max, 0)}
+          section={section}
+        />
       </div>
     </div>
   );
