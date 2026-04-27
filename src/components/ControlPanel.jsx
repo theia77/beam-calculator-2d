@@ -2,50 +2,35 @@ export default function ControlPanel({
   beamLength, setBeamLength,
   supportA, setSupportA,
   supportB, setSupportB,
+  reactions,
   pointLoad, setPointLoad,
   udlLoad, setUdlLoad,
-  momentLoad, setMomentLoad,
-  reactions
+  uvlLoad, setUvlLoad,
+  momentLoad, setMomentLoad
 }) {
   return (
     <div className="control-panel">
       <h3>Controls</h3>
 
-      {/* Beam Length */}
+      {/* Beam & Supports */}
       <div className="control-group">
         <label>Total Beam Length: {beamLength} m</label>
-        <input
-          type="range" min="5" max="30" step="1"
-          value={beamLength}
-          onChange={(e) => setBeamLength(Number(e.target.value))}
-        />
-      </div>
+        <input type="range" min="5" max="30" step="1" value={beamLength}
+          onChange={(e) => setBeamLength(Number(e.target.value))} />
 
-      {/* Support Positions */}
-      <div className="control-group">
         <label>Support A Position: {supportA} m</label>
-        <input
-          type="range" min="0" max={supportB - 1} step="0.1"
-          value={supportA}
-          onChange={(e) => setSupportA(Number(e.target.value))}
-        />
-        <label>Support B Position: {supportB} m</label>
-        <input
-          type="range" min={supportA + 1} max={beamLength} step="0.1"
-          value={supportB}
-          onChange={(e) => setSupportB(Number(e.target.value))}
-        />
-      </div>
+        <input type="range" min="0" max={supportB - 0.1} step="0.1" value={supportA}
+          onChange={(e) => setSupportA(Number(e.target.value))} />
 
-      {/* Reactions Display */}
-      {reactions && (
-        <div className="control-group" style={{ background: '#f8fafc', borderRadius: '6px', padding: '8px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-            <span>R<sub>A</sub> = <strong>{reactions.rA.toFixed(2)} kN</strong></span>
-            <span>R<sub>B</sub> = <strong>{reactions.rB.toFixed(2)} kN</strong></span>
-          </div>
+        <label>Support B Position: {supportB} m</label>
+        <input type="range" min={supportA + 0.1} max={beamLength} step="0.1" value={supportB}
+          onChange={(e) => setSupportB(Number(e.target.value))} />
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '15px', padding: '10px', background: '#e2e8f0', borderRadius: '6px' }}>
+          <span><b>R<sub>A</sub></b> = {reactions.rA.toFixed(2)} kN</span>
+          <span><b>R<sub>B</sub></b> = {reactions.rB.toFixed(2)} kN</span>
         </div>
-      )}
+      </div>
 
       {/* Point Load */}
       <div className="control-group">
@@ -76,7 +61,7 @@ export default function ControlPanel({
         {udlLoad.active && (
           <>
             <label>Magnitude: {udlLoad.mag} kN/m</label>
-            <input type="range" min="0" max="50" value={udlLoad.mag}
+            <input type="range" min="-50" max="50" value={udlLoad.mag}
               onChange={(e) => setUdlLoad({ ...udlLoad, mag: Number(e.target.value) })} />
             <label>Start Pos: {udlLoad.start} m</label>
             <input type="range" min="0" max={udlLoad.end - 0.1} step="0.1" value={udlLoad.start}
@@ -84,6 +69,28 @@ export default function ControlPanel({
             <label>End Pos: {udlLoad.end} m</label>
             <input type="range" min={udlLoad.start + 0.1} max={beamLength} step="0.1" value={udlLoad.end}
               onChange={(e) => setUdlLoad({ ...udlLoad, end: Number(e.target.value) })} />
+          </>
+        )}
+      </div>
+
+      {/* UVL */}
+      <div className="control-group">
+        <label>
+          <input type="checkbox" checked={uvlLoad.active}
+            onChange={(e) => setUvlLoad({ ...uvlLoad, active: e.target.checked })} />
+          {' '}Triangular Load (UVL)
+        </label>
+        {uvlLoad.active && (
+          <>
+            <label>Peak Magnitude: {uvlLoad.mag} kN/m</label>
+            <input type="range" min="-50" max="50" value={uvlLoad.mag}
+              onChange={(e) => setUvlLoad({ ...uvlLoad, mag: Number(e.target.value) })} />
+            <label>Start Pos (0 kN/m): {uvlLoad.start} m</label>
+            <input type="range" min="0" max={uvlLoad.end - 0.1} step="0.1" value={uvlLoad.start}
+              onChange={(e) => setUvlLoad({ ...uvlLoad, start: Number(e.target.value) })} />
+            <label>End Pos (Peak kN/m): {uvlLoad.end} m</label>
+            <input type="range" min={uvlLoad.start + 0.1} max={beamLength} step="0.1" value={uvlLoad.end}
+              onChange={(e) => setUvlLoad({ ...uvlLoad, end: Number(e.target.value) })} />
           </>
         )}
       </div>

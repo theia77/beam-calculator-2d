@@ -12,19 +12,27 @@ export function solveReactions(L, loads, xA, xB) {
   let totalVerticalForce = 0;
 
   loads.forEach(load => {
+    const mag = load.mag;
+    let force = 0;
+    let arm = 0;
+
     if (load.type === 'point') {
-      const force = load.mag;
-      const arm = load.pos - xA;
-      totalVerticalForce += force;
-      totalMomentAboutA += force * arm;
+      force = mag;
+      arm = load.pos - xA;
     } else if (load.type === 'udl') {
-      const force = load.mag * (load.end - load.start);
-      const arm = (load.start + (load.end - load.start) / 2) - xA;
-      totalVerticalForce += force;
-      totalMomentAboutA += force * arm;
+      force = mag * (load.end - load.start);
+      arm = (load.start + (load.end - load.start) / 2) - xA;
+    } else if (load.type === 'uvl') {
+      const length = load.end - load.start;
+      force = 0.5 * mag * length;
+      arm = (load.start + length * (2 / 3)) - xA;
     } else if (load.type === 'moment') {
-      totalMomentAboutA += load.mag;
+      totalMomentAboutA += mag;
+      return;
     }
+
+    totalVerticalForce += force;
+    totalMomentAboutA += force * arm;
   });
 
   const rB = totalMomentAboutA / span;
@@ -34,11 +42,8 @@ export function solveReactions(L, loads, xA, xB) {
 }
 
 export function calculateInternalForces(x, L, loads, xA, xB, rA, rB) {
-  let shear = rA * mac(x, xA, 0);
-  let moment = rA * mac(x, xA, 1);
-
-  shear += rB * mac(x, xB, 0);
-  moment += rB * mac(x, xB, 1);
+  let shear = rA * mac(x, xA, 0) + rB * mac(x, xB, 0);
+  let moment = rA * mac(x, xA, 1) + rB * mac(x, xB, 1);
 
   loads.forEach(load => {
     if (load.type === 'point') {
@@ -47,6 +52,13 @@ export function calculateInternalForces(x, L, loads, xA, xB, rA, rB) {
     } else if (load.type === 'udl') {
       shear -= load.mag * mac(x, load.start, 1) - load.mag * mac(x, load.end, 1);
       moment -= (load.mag / 2) * mac(x, load.start, 2) - (load.mag / 2) * mac(x, load.end, 2);
+    } else if (load.type === 'uvl') {
+      const length = load.end - load.start;
+      if (length > 0) {
+        const k = load.mag / length;
+        shear -= (k / 2) * mac(x, load.start, 2) - (k / 2) * mac(x, load.end, 2) - load.mag * mac(x, load.end, 1);
+        moment -= (k / 6) * mac(x, load.start, 3) - (k / 6) * mac(x, load.end, 3) - (load.mag / 2) * mac(x, load.end, 2);
+      }
     } else if (load.type === 'moment') {
       moment -= load.mag * mac(x, load.pos, 0);
     }
