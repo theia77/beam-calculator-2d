@@ -53,8 +53,16 @@ export default function ControlPanel({
         </label>
         {pointLoad.active && (
           <>
-            <label>Magnitude: {pointLoad.mag} kN (Negative = Upward)</label>
-            <input type="range" min="-100" max="100" value={pointLoad.mag}
+            <div style={{ display: 'flex', gap: '15px', margin: '8px 0' }}>
+              <label style={{ fontWeight: 'normal' }}>
+                <input type="radio" checked={pointLoad.dir === 'down'} onChange={() => setPointLoad({ ...pointLoad, dir: 'down' })} /> Downward
+              </label>
+              <label style={{ fontWeight: 'normal' }}>
+                <input type="radio" checked={pointLoad.dir === 'up'} onChange={() => setPointLoad({ ...pointLoad, dir: 'up' })} /> Upward
+              </label>
+            </div>
+            <label>Magnitude: {pointLoad.mag} kN</label>
+            <input type="range" min="0" max="100" value={pointLoad.mag}
               onChange={(e) => setPointLoad({ ...pointLoad, mag: Number(e.target.value) })} />
             <label>Position: {pointLoad.pos} m</label>
             <input type="range" min="0" max={beamLength} step="0.1" value={pointLoad.pos}
@@ -116,8 +124,16 @@ export default function ControlPanel({
         </label>
         {momentLoad.active && (
           <>
+            <div style={{ display: 'flex', gap: '15px', margin: '8px 0' }}>
+              <label style={{ fontWeight: 'normal' }}>
+                <input type="radio" checked={momentLoad.dir === 'cw'} onChange={() => setMomentLoad({ ...momentLoad, dir: 'cw' })} /> Clockwise
+              </label>
+              <label style={{ fontWeight: 'normal' }}>
+                <input type="radio" checked={momentLoad.dir === 'ccw'} onChange={() => setMomentLoad({ ...momentLoad, dir: 'ccw' })} /> Anti-Clockwise
+              </label>
+            </div>
             <label>Magnitude: {momentLoad.mag} kN·m</label>
-            <input type="range" min="-100" max="100" value={momentLoad.mag}
+            <input type="range" min="0" max="100" value={momentLoad.mag}
               onChange={(e) => setMomentLoad({ ...momentLoad, mag: Number(e.target.value) })} />
             <label>Position: {momentLoad.pos} m</label>
             <input type="range" min="0" max={beamLength} step="0.1" value={momentLoad.pos}

@@ -15,17 +15,30 @@ export default function App() {
   const [material, setMaterial] = useState(materials[0]);
   const [section, setSection] = useState(sections[0]);
 
-  const [pointLoad, setPointLoad] = useState({ active: true, mag: 50, pos: 5 });
+  const [pointLoad, setPointLoad] = useState({ active: true, mag: 50, pos: 5, dir: 'down' });
   const [udlLoad, setUdlLoad] = useState({ active: false, mag: 10, start: 2, end: 8 });
   const [uvlLoad, setUvlLoad] = useState({ active: false, mag: 20, start: 0, end: 5 });
-  const [momentLoad, setMomentLoad] = useState({ active: false, mag: 50, pos: 5 });
+  const [momentLoad, setMomentLoad] = useState({ active: false, mag: 50, pos: 5, dir: 'cw' });
 
   const { plotData, reactions } = useMemo(() => {
     const activeLoads = [];
-    if (pointLoad.active) activeLoads.push({ type: 'point', ...pointLoad });
+
+    if (pointLoad.active) {
+      activeLoads.push({
+        type: 'point',
+        ...pointLoad,
+        mag: pointLoad.dir === 'down' ? pointLoad.mag : -pointLoad.mag
+      });
+    }
     if (udlLoad.active) activeLoads.push({ type: 'udl', ...udlLoad });
     if (uvlLoad.active) activeLoads.push({ type: 'uvl', ...uvlLoad });
-    if (momentLoad.active) activeLoads.push({ type: 'moment', ...momentLoad });
+    if (momentLoad.active) {
+      activeLoads.push({
+        type: 'moment',
+        ...momentLoad,
+        mag: momentLoad.dir === 'cw' ? momentLoad.mag : -momentLoad.mag
+      });
+    }
 
     return generatePlotData(beamLength, activeLoads, supportA, supportB, material, section);
   }, [beamLength, supportA, supportB, material, section, pointLoad, udlLoad, uvlLoad, momentLoad]);

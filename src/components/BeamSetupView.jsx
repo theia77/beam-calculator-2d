@@ -40,29 +40,32 @@ export default function BeamSetupView({
         <text x={scaleX(supportB)} y={Y_BEAM + 60} textAnchor="middle" fontSize="14" fill="#475569" fontWeight="bold">Roller (B)</text>
 
         {/* Point Load */}
-        {pointLoad.active && (
-          <g>
-            <line
-              x1={scaleX(pointLoad.pos)} y1={pointLoad.mag >= 0 ? Y_BEAM - 90 : Y_BEAM + 90}
-              x2={scaleX(pointLoad.pos)} y2={pointLoad.mag >= 0 ? Y_BEAM - 15 : Y_BEAM + 15}
-              stroke="#ef4444" strokeWidth="3"
-            />
-            <polygon
-              points={pointLoad.mag >= 0
-                ? `${scaleX(pointLoad.pos)},${Y_BEAM - 10} ${scaleX(pointLoad.pos) - 6},${Y_BEAM - 20} ${scaleX(pointLoad.pos) + 6},${Y_BEAM - 20}`
-                : `${scaleX(pointLoad.pos)},${Y_BEAM + 10} ${scaleX(pointLoad.pos) - 6},${Y_BEAM + 20} ${scaleX(pointLoad.pos) + 6},${Y_BEAM + 20}`
-              }
-              fill="#ef4444"
-            />
-            <text
-              x={scaleX(pointLoad.pos)}
-              y={pointLoad.mag >= 0 ? Y_BEAM - 100 : Y_BEAM + 110}
-              textAnchor="middle" fontSize="14" fill="#ef4444" fontWeight="bold"
-            >
-              {Math.abs(pointLoad.mag)} kN
-            </text>
-          </g>
-        )}
+        {pointLoad.active && (() => {
+          const isDown = pointLoad.dir === 'down';
+          return (
+            <g>
+              <line
+                x1={scaleX(pointLoad.pos)} y1={isDown ? Y_BEAM - 90 : Y_BEAM + 90}
+                x2={scaleX(pointLoad.pos)} y2={isDown ? Y_BEAM - 15 : Y_BEAM + 15}
+                stroke="#ef4444" strokeWidth="3"
+              />
+              <polygon
+                points={isDown
+                  ? `${scaleX(pointLoad.pos)},${Y_BEAM - 10} ${scaleX(pointLoad.pos) - 6},${Y_BEAM - 20} ${scaleX(pointLoad.pos) + 6},${Y_BEAM - 20}`
+                  : `${scaleX(pointLoad.pos)},${Y_BEAM + 10} ${scaleX(pointLoad.pos) - 6},${Y_BEAM + 20} ${scaleX(pointLoad.pos) + 6},${Y_BEAM + 20}`
+                }
+                fill="#ef4444"
+              />
+              <text
+                x={scaleX(pointLoad.pos)}
+                y={isDown ? Y_BEAM - 100 : Y_BEAM + 110}
+                textAnchor="middle" fontSize="14" fill="#ef4444" fontWeight="bold"
+              >
+                {pointLoad.mag} kN
+              </text>
+            </g>
+          );
+        })()}
 
         {/* UDL */}
         {udlLoad.active && (
@@ -92,18 +95,25 @@ export default function BeamSetupView({
         )}
 
         {/* Applied Moment */}
-        {momentLoad.active && (
-          <g>
-            <path
-              d={`M ${scaleX(momentLoad.pos) - 20} ${Y_BEAM - 30} A 25 25 0 1 1 ${scaleX(momentLoad.pos) + 20} ${Y_BEAM - 30}`}
-              fill="none" stroke="#8b5cf6" strokeWidth="3"
-            />
-            <polygon points={`${scaleX(momentLoad.pos) + 20},${Y_BEAM - 30} ${scaleX(momentLoad.pos) + 15},${Y_BEAM - 40} ${scaleX(momentLoad.pos) + 28},${Y_BEAM - 35}`} fill="#8b5cf6" />
-            <text x={scaleX(momentLoad.pos)} y={Y_BEAM - 65} textAnchor="middle" fontSize="14" fill="#8b5cf6" fontWeight="bold">
-              {Math.abs(momentLoad.mag)} kN·m
-            </text>
-          </g>
-        )}
+        {momentLoad.active && (() => {
+          const isCW = momentLoad.dir === 'cw';
+          return (
+            <g>
+              <path
+                d={`M ${scaleX(momentLoad.pos) - 20} ${Y_BEAM - 30} A 25 25 0 1 1 ${scaleX(momentLoad.pos) + 20} ${Y_BEAM - 30}`}
+                fill="none" stroke="#8b5cf6" strokeWidth="3"
+              />
+              {isCW ? (
+                <polygon points={`${scaleX(momentLoad.pos) + 20},${Y_BEAM - 30} ${scaleX(momentLoad.pos) + 15},${Y_BEAM - 40} ${scaleX(momentLoad.pos) + 28},${Y_BEAM - 35}`} fill="#8b5cf6" />
+              ) : (
+                <polygon points={`${scaleX(momentLoad.pos) - 20},${Y_BEAM - 30} ${scaleX(momentLoad.pos) - 15},${Y_BEAM - 40} ${scaleX(momentLoad.pos) - 28},${Y_BEAM - 35}`} fill="#8b5cf6" />
+              )}
+              <text x={scaleX(momentLoad.pos)} y={Y_BEAM - 65} textAnchor="middle" fontSize="14" fill="#8b5cf6" fontWeight="bold">
+                {momentLoad.mag} kN·m
+              </text>
+            </g>
+          );
+        })()}
 
         {/* Axis Labels */}
         <text x={scaleX(0)} y={Y_BEAM + 90} textAnchor="middle" fontSize="12" fill="#94a3b8">0 m</text>
