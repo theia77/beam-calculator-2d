@@ -60,3 +60,17 @@ export function calcUVL(x, L, mag, start, end, beamType) {
 
   return { shear, moment };
 }
+
+export function calcMomentLoad(x, L, mag, pos, beamType) {
+  let R1 = 0;
+  let M_wall = 0;
+  if (beamType === 'simply_supported') {
+    R1 = -mag / L;
+  } else if (beamType === 'cantilever') {
+    R1 = 0;
+    M_wall = -mag;
+  }
+  const shear = R1;
+  const moment = M_wall + (R1 * x) + (mag * mac(x, pos, 0));
+  return { shear, moment };
+}

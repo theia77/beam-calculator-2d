@@ -1,14 +1,26 @@
 export default function ControlPanel({
+  beamLength, setBeamLength,
   beamType, setBeamType,
   pointLoad, setPointLoad,
   udlLoad, setUdlLoad,
   uvlLoad, setUvlLoad,
-  beamLength
+  momentLoad, setMomentLoad
 }) {
   return (
     <div className="control-panel">
       <h3>Controls</h3>
 
+      {/* Beam Length */}
+      <div className="control-group">
+        <label>Total Beam Length: {beamLength} m</label>
+        <input
+          type="range" min="5" max="30" step="1"
+          value={beamLength}
+          onChange={(e) => setBeamLength(Number(e.target.value))}
+        />
+      </div>
+
+      {/* Beam Type */}
       <div className="control-group">
         <label>Beam Type</label>
         <select
@@ -80,6 +92,25 @@ export default function ControlPanel({
             <label>End Pos (Peak kN/m): {uvlLoad.end} m</label>
             <input type="range" min={uvlLoad.start + 0.1} max={beamLength} step="0.1" value={uvlLoad.end}
               onChange={(e) => setUvlLoad({ ...uvlLoad, end: Number(e.target.value) })} />
+          </>
+        )}
+      </div>
+
+      {/* Applied Moment */}
+      <div className="control-group">
+        <label>
+          <input type="checkbox" checked={momentLoad.active}
+            onChange={(e) => setMomentLoad({ ...momentLoad, active: e.target.checked })} />
+          {' '}Applied Moment
+        </label>
+        {momentLoad.active && (
+          <>
+            <label>Magnitude: {momentLoad.mag} kN·m</label>
+            <input type="range" min="-100" max="100" value={momentLoad.mag}
+              onChange={(e) => setMomentLoad({ ...momentLoad, mag: Number(e.target.value) })} />
+            <label>Position: {momentLoad.pos} m</label>
+            <input type="range" min="0" max={beamLength} step="0.1" value={momentLoad.pos}
+              onChange={(e) => setMomentLoad({ ...momentLoad, pos: Number(e.target.value) })} />
           </>
         )}
       </div>
