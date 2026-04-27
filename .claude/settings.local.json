@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git rebase *)",
+      "Bash(mv .claude/settings.local.json .claude/settings.local.json.bak)",
+      "Bash(mv .claude/settings.local.json.bak .claude/settings.local.json)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(git rm *)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "WebFetch(domain:beam-calculator-2d-b5c5ojueb-theias-projects-da923d99.vercel.app)",
+      "Bash(git checkout *)",
+      "Bash(git push *)"
+    ]
+  }
+}
