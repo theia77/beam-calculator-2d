@@ -3,11 +3,15 @@ import ControlPanel from './components/ControlPanel';
 import ChartSFD from './components/ChartSFD';
 import ChartBMD from './components/ChartBMD';
 import { generatePlotData } from './core/superposition';
+import { materials, sections } from './core/beamData';
 
 export default function App() {
   const [beamLength, setBeamLength] = useState(10);
   const [supportA, setSupportA] = useState(0);
   const [supportB, setSupportB] = useState(10);
+
+  const [material, setMaterial] = useState(materials[0]);
+  const [section, setSection] = useState(sections[0]);
 
   const [pointLoad, setPointLoad] = useState({ active: true, mag: 50, pos: 5 });
   const [udlLoad, setUdlLoad] = useState({ active: false, mag: 10, start: 2, end: 8 });
@@ -21,9 +25,8 @@ export default function App() {
     if (uvlLoad.active) activeLoads.push({ type: 'uvl', ...uvlLoad });
     if (momentLoad.active) activeLoads.push({ type: 'moment', ...momentLoad });
 
-    const result = generatePlotData(beamLength, activeLoads, supportA, supportB);
-    return { plotData: result.data, reactions: { rA: result.rA, rB: result.rB } };
-  }, [beamLength, supportA, supportB, pointLoad, udlLoad, uvlLoad, momentLoad]);
+    return generatePlotData(beamLength, activeLoads, supportA, supportB, material, section);
+  }, [beamLength, supportA, supportB, material, section, pointLoad, udlLoad, uvlLoad, momentLoad]);
 
   return (
     <div className="app-container">
@@ -34,6 +37,8 @@ export default function App() {
           supportA={supportA} setSupportA={setSupportA}
           supportB={supportB} setSupportB={setSupportB}
           reactions={reactions}
+          material={material} setMaterial={setMaterial}
+          section={section} setSection={setSection}
           pointLoad={pointLoad} setPointLoad={setPointLoad}
           udlLoad={udlLoad} setUdlLoad={setUdlLoad}
           uvlLoad={uvlLoad} setUvlLoad={setUvlLoad}

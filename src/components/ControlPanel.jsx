@@ -1,8 +1,12 @@
+import { materials, sections } from '../core/beamData';
+
 export default function ControlPanel({
   beamLength, setBeamLength,
   supportA, setSupportA,
   supportB, setSupportB,
   reactions,
+  material, setMaterial,
+  section, setSection,
   pointLoad, setPointLoad,
   udlLoad, setUdlLoad,
   uvlLoad, setUvlLoad,
@@ -30,6 +34,22 @@ export default function ControlPanel({
           <span><b>R<sub>A</sub></b> = {reactions.rA.toFixed(2)} kN</span>
           <span><b>R<sub>B</sub></b> = {reactions.rB.toFixed(2)} kN</span>
         </div>
+      </div>
+
+      {/* Material & Section */}
+      <div className="control-group">
+        <label>Material</label>
+        <select style={{ width: '100%', padding: '5px', marginBottom: '8px' }}
+          value={material.id}
+          onChange={(e) => setMaterial(materials.find(m => m.id === e.target.value))}>
+          {materials.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
+        </select>
+        <label>Cross Section</label>
+        <select style={{ width: '100%', padding: '5px' }}
+          value={section.id}
+          onChange={(e) => setSection(sections.find(s => s.id === e.target.value))}>
+          {sections.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+        </select>
       </div>
 
       {/* Point Load */}
