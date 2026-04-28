@@ -12,27 +12,33 @@ export function solveReactions(L, loads, xA, xB) {
   let totalVerticalForce = 0;
 
   loads.forEach(load => {
-    const mag = load.mag;
     let force = 0;
     let arm = 0;
 
     if (load.type === 'point') {
-      force = mag;
+      force = load.mag;
       arm = load.pos - xA;
-    } else if (load.type === 'udl') {
-      force = mag * (load.end - load.start);
-      arm = (load.start + (load.end - load.start) / 2) - xA;
-    } else if (load.type === 'uvl') {
-      const length = load.end - load.start;
-      force = 0.5 * mag * length;
-      arm = (load.start + length * (2 / 3)) - xA;
     } else if (load.type === 'moment') {
-      totalMomentAboutA += mag;
+      totalMomentAboutA += load.mag;
       return;
+    } else if (load.type === 'distributed') {
+      const length = load.endPos - load.startPos;
+      if (length <= 0) return;
+
+      const w1 = load.startMag;
+      const w2 = load.endMag;
+
+      const forceRect = w1 * length;
+      const armRect = (load.startPos + length / 2) - xA;
+
+      const forceTri = 0.5 * (w2 - w1) * length;
+      const armTri = (load.startPos + length * (2 / 3)) - xA;
+
+      force = forceRect + forceTri;
+      totalMomentAboutA += (forceRect * armRect) + (forceTri * armTri);
     }
 
     totalVerticalForce += force;
-    totalMomentAboutA += force * arm;
   });
 
   const rB = totalMomentAboutA / span;
@@ -49,18 +55,23 @@ export function calculateInternalForces(x, L, loads, xA, xB, rA, rB) {
     if (load.type === 'point') {
       shear -= load.mag * mac(x, load.pos, 0);
       moment -= load.mag * mac(x, load.pos, 1);
-    } else if (load.type === 'udl') {
-      shear -= load.mag * mac(x, load.start, 1) - load.mag * mac(x, load.end, 1);
-      moment -= (load.mag / 2) * mac(x, load.start, 2) - (load.mag / 2) * mac(x, load.end, 2);
-    } else if (load.type === 'uvl') {
-      const length = load.end - load.start;
-      if (length > 0) {
-        const k = load.mag / length;
-        shear -= (k / 2) * mac(x, load.start, 2) - (k / 2) * mac(x, load.end, 2) - load.mag * mac(x, load.end, 1);
-        moment -= (k / 6) * mac(x, load.start, 3) - (k / 6) * mac(x, load.end, 3) - (load.mag / 2) * mac(x, load.end, 2);
-      }
     } else if (load.type === 'moment') {
       moment -= load.mag * mac(x, load.pos, 0);
+    } else if (load.type === 'distributed') {
+      const length = load.endPos - load.startPos;
+      if (length <= 0) return;
+
+      const w1 = load.startMag;
+      const w2 = load.endMag;
+      const k = (w2 - w1) / length;
+
+      // Rectangular part
+      shear -= w1 * mac(x, load.startPos, 1) - w1 * mac(x, load.endPos, 1);
+      moment -= (w1 / 2) * mac(x, load.startPos, 2) - (w1 / 2) * mac(x, load.endPos, 2);
+
+      // Triangular part
+      shear -= (k / 2) * mac(x, load.startPos, 2) - (k / 2) * mac(x, load.endPos, 2) - (w2 - w1) * mac(x, load.endPos, 1);
+      moment -= (k / 6) * mac(x, load.startPos, 3) - (k / 6) * mac(x, load.endPos, 3) - ((w2 - w1) / 2) * mac(x, load.endPos, 2);
     }
   });
 
