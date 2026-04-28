@@ -18,6 +18,7 @@ export function solveReactions(L, loads, xA, xB) {
     if (load.type === 'point') {
       force = load.mag;
       arm = load.pos - xA;
+      totalMomentAboutA += force * arm;
     } else if (load.type === 'moment') {
       totalMomentAboutA += load.mag;
       return;
@@ -56,7 +57,7 @@ export function calculateInternalForces(x, L, loads, xA, xB, rA, rB) {
       shear -= load.mag * mac(x, load.pos, 0);
       moment -= load.mag * mac(x, load.pos, 1);
     } else if (load.type === 'moment') {
-      moment -= load.mag * mac(x, load.pos, 0);
+      moment += load.mag * mac(x, load.pos, 0);
     } else if (load.type === 'distributed') {
       const length = load.endPos - load.startPos;
       if (length <= 0) return;
