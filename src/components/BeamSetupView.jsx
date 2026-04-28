@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function BeamSetupView({ beamLength, supportA, supportB, pointLoad, momentLoad, distLoad }) {
+export default function BeamSetupView({ beamLength, supports, pointLoad, momentLoad, distLoad }) {
   const SVG_WIDTH = 800;
   const PADDING = 100;
   const Y_BEAM = 150;
@@ -20,12 +20,46 @@ export default function BeamSetupView({ beamLength, supportA, supportB, pointLoa
 
         <rect x={scaleX(0)} y={Y_BEAM - 10} width={SVG_WIDTH} height={20} fill="#3b82f6" stroke="#1d4ed8" strokeWidth="2" rx="4" />
 
-        <polygon points={`${scaleX(supportA)},${Y_BEAM + 10} ${scaleX(supportA) - 15},${Y_BEAM + 40} ${scaleX(supportA) + 15},${Y_BEAM + 40}`} fill="#64748b" stroke="#475569" strokeWidth="2" />
-        <text x={scaleX(supportA)} y={Y_BEAM + 60} textAnchor="middle" fontSize="14" fill="#475569" fontWeight="bold">Pin (A)</text>
+        {/* Dynamic supports loop */}
+        {supports.map((sup) => {
+          const cx = scaleX(sup.x);
 
-        <circle cx={scaleX(supportB)} cy={Y_BEAM + 25} r="15" fill="#e2e8f0" stroke="#475569" strokeWidth="2" />
-        <circle cx={scaleX(supportB)} cy={Y_BEAM + 25} r="5" fill="#64748b" />
-        <text x={scaleX(supportB)} y={Y_BEAM + 60} textAnchor="middle" fontSize="14" fill="#475569" fontWeight="bold">Roller (B)</text>
+          if (sup.type === 'pin') {
+            return (
+              <g key={sup.id}>
+                <polygon points={`${cx},${Y_BEAM + 10} ${cx - 15},${Y_BEAM + 40} ${cx + 15},${Y_BEAM + 40}`} fill="#64748b" stroke="#475569" strokeWidth="2" />
+                <line x1={cx - 20} y1={Y_BEAM + 40} x2={cx + 20} y2={Y_BEAM + 40} stroke="#475569" strokeWidth="3" />
+                <text x={cx} y={Y_BEAM + 60} textAnchor="middle" fontSize="14" fill="#475569" fontWeight="bold">Pin</text>
+              </g>
+            );
+          }
+          else if (sup.type === 'roller') {
+            return (
+              <g key={sup.id}>
+                <circle cx={cx} cy={Y_BEAM + 25} r="15" fill="#e2e8f0" stroke="#475569" strokeWidth="2" />
+                <circle cx={cx} cy={Y_BEAM + 25} r="5" fill="#64748b" />
+                <line x1={cx - 20} y1={Y_BEAM + 40} x2={cx + 20} y2={Y_BEAM + 40} stroke="#475569" strokeWidth="3" />
+                <text x={cx} y={Y_BEAM + 60} textAnchor="middle" fontSize="14" fill="#475569" fontWeight="bold">Roller</text>
+              </g>
+            );
+          }
+          else if (sup.type === 'fixed') {
+            const isLeft = sup.x < beamLength / 2;
+            return (
+              <g key={sup.id}>
+                {/* Vertical Wall */}
+                <rect x={isLeft ? cx - 15 : cx} y={Y_BEAM - 40} width="15" height="100" fill="#cbd5e1" stroke="#475569" strokeWidth="2" />
+                {/* Diagonal Hash Marks */}
+                <path d={isLeft
+                  ? `M ${cx-15} ${Y_BEAM-30} L ${cx-25} ${Y_BEAM-40} M ${cx-15} ${Y_BEAM-10} L ${cx-25} ${Y_BEAM-20} M ${cx-15} ${Y_BEAM+10} L ${cx-25} ${Y_BEAM} M ${cx-15} ${Y_BEAM+30} L ${cx-25} ${Y_BEAM+20} M ${cx-15} ${Y_BEAM+50} L ${cx-25} ${Y_BEAM+40}`
+                  : `M ${cx+15} ${Y_BEAM-30} L ${cx+25} ${Y_BEAM-40} M ${cx+15} ${Y_BEAM-10} L ${cx+25} ${Y_BEAM-20} M ${cx+15} ${Y_BEAM+10} L ${cx+25} ${Y_BEAM} M ${cx+15} ${Y_BEAM+30} L ${cx+25} ${Y_BEAM+20} M ${cx+15} ${Y_BEAM+50} L ${cx+25} ${Y_BEAM+40}`
+                } stroke="#64748b" strokeWidth="2" />
+                <text x={isLeft ? cx - 20 : cx + 20} y={Y_BEAM + 80} textAnchor="middle" fontSize="14" fill="#475569" fontWeight="bold">Fixed</text>
+              </g>
+            );
+          }
+          return null;
+        })}
 
         {pointLoad.active && (() => {
           const isDown = pointLoad.dir === 'down';

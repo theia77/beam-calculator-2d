@@ -2,7 +2,7 @@ import { materials, sections } from '../core/beamData';
 
 export default function ControlPanel({
   beamLength, setBeamLength,
-  supportA, setSupportA, supportB, setSupportB,
+  supports, setSupports,
   pointLoad, setPointLoad,
   momentLoad, setMomentLoad,
   distLoad, setDistLoad,
@@ -36,12 +36,63 @@ export default function ControlPanel({
       <div style={groupStyle}>
         <label style={labelStyle}>Total Beam Length (m):</label>
         <input type="number" step="any" value={beamLength} onChange={(e) => setBeamLength(Number(e.target.value))} style={inputStyle} />
+      </div>
 
-        <label style={labelStyle}>Support A Position (m):</label>
-        <input type="number" step="any" value={supportA} onChange={(e) => setSupportA(Number(e.target.value))} style={inputStyle} />
+      {/* Dynamic Supports Manager */}
+      <div style={groupStyle}>
+        <h3 style={{ margin: '0 0 15px 0', color: '#1e293b', borderBottom: '1px solid #cbd5e1', paddingBottom: '10px' }}>Supports</h3>
 
-        <label style={labelStyle}>Support B Position (m):</label>
-        <input type="number" step="any" value={supportB} onChange={(e) => setSupportB(Number(e.target.value))} style={inputStyle} />
+        {supports.map((sup, index) => (
+          <div key={sup.id} style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px', background: '#f8fafc', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+            <div style={{ flex: 1 }}>
+              <select
+                value={sup.type}
+                onChange={(e) => {
+                  const newSups = [...supports];
+                  if (e.target.value === 'fixed') {
+                    newSups[index].x = sup.x > beamLength / 2 ? beamLength : 0;
+                  }
+                  newSups[index].type = e.target.value;
+                  setSupports(newSups);
+                }}
+                style={{ ...inputStyle, marginBottom: 0 }}
+              >
+                <option value="pin">Pin (Triangle)</option>
+                <option value="roller">Roller (Circle)</option>
+                <option value="fixed">Fixed (Wall)</option>
+              </select>
+            </div>
+
+            <div style={{ flex: 1 }}>
+              <input
+                type="number" step="any"
+                value={sup.x}
+                disabled={sup.type === 'fixed'}
+                title={sup.type === 'fixed' ? 'Fixed supports must be at ends' : ''}
+                onChange={(e) => {
+                  const newSups = [...supports];
+                  newSups[index].x = Number(e.target.value);
+                  setSupports(newSups);
+                }}
+                style={{ ...inputStyle, marginBottom: 0, backgroundColor: sup.type === 'fixed' ? '#e2e8f0' : 'white' }}
+              />
+            </div>
+
+            <button
+              onClick={() => setSupports(supports.filter(s => s.id !== sup.id))}
+              style={{ background: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', padding: '12px 15px', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              X
+            </button>
+          </div>
+        ))}
+
+        <button
+          onClick={() => setSupports([...supports, { id: Date.now(), type: 'roller', x: beamLength / 2 }])}
+          style={{ width: '100%', padding: '10px', background: '#e2e8f0', color: '#475569', border: '2px dashed #94a3b8', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', marginTop: '10px' }}
+        >
+          + Add Support
+        </button>
       </div>
 
       <div style={groupStyle}>
