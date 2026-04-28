@@ -83,17 +83,25 @@ export default function BeamSetupView({ beamLength, supportA, supportB, pointLoa
           );
         })()}
 
+        {/* Applied Moment */}
         {momentLoad.active && (() => {
           const isCW = momentLoad.dir === 'cw';
+          const cx = scaleX(momentLoad.pos);
           return (
             <g>
-              <path d={`M ${scaleX(momentLoad.pos) - 20} ${Y_BEAM - 30} A 25 25 0 1 1 ${scaleX(momentLoad.pos) + 20} ${Y_BEAM - 30}`} fill="none" stroke="#8b5cf6" strokeWidth="3" />
+              <circle cx={cx} cy={Y_BEAM} r="5" fill="#f59e0b" />
+              <path
+                d={`M ${cx - 25} ${Y_BEAM + 5} A 25 25 0 1 1 ${cx + 25} ${Y_BEAM + 5}`}
+                fill="none" stroke="#f59e0b" strokeWidth="3"
+              />
               {isCW ? (
-                <polygon points={`${scaleX(momentLoad.pos) + 20},${Y_BEAM - 30} ${scaleX(momentLoad.pos) + 15},${Y_BEAM - 40} ${scaleX(momentLoad.pos) + 28},${Y_BEAM - 35}`} fill="#8b5cf6" />
+                <polygon points={`${cx + 25},${Y_BEAM + 5} ${cx + 18},${Y_BEAM - 5} ${cx + 32},${Y_BEAM - 2}`} fill="#f59e0b" />
               ) : (
-                <polygon points={`${scaleX(momentLoad.pos) - 20},${Y_BEAM - 30} ${scaleX(momentLoad.pos) - 15},${Y_BEAM - 40} ${scaleX(momentLoad.pos) - 28},${Y_BEAM - 35}`} fill="#8b5cf6" />
+                <polygon points={`${cx - 25},${Y_BEAM + 5} ${cx - 18},${Y_BEAM - 5} ${cx - 32},${Y_BEAM - 2}`} fill="#f59e0b" />
               )}
-              <text x={scaleX(momentLoad.pos)} y={Y_BEAM - 65} textAnchor="middle" fontSize="14" fill="#8b5cf6" fontWeight="bold">{momentLoad.mag} kN·m</text>
+              <text x={cx} y={Y_BEAM - 40} textAnchor="middle" fontSize="14" fill="#d97706" fontWeight="bold">
+                {momentLoad.mag} kN·m
+              </text>
             </g>
           );
         })()}
