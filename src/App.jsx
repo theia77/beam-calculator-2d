@@ -50,85 +50,63 @@ export default function App() {
         moment: getPeak('moment'),
         deflection: getPeak('deflection'),
         slope: getPeak('slope'),
-        stress: Math.max(...result.plotData.map(d => d.stress)),
-      },
+        stress: Math.max(...result.plotData.map(d => d.stress))
+      }
     };
   }, [beamLength, supportA, supportB, pointLoad, momentLoad, distLoad, material, section]);
 
   return (
-    <div className="app-container" style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px' }}>
+    <div className="app-container" style={{ width: '100%', maxWidth: '1920px', boxSizing: 'border-box', margin: '0 auto', padding: '20px 40px' }}>
 
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '2px solid #e2e8f0', paddingBottom: '15px' }}>
-        <h2 style={{ margin: 0, color: '#1e293b' }}>Structural Analysis Engine</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', borderBottom: '3px solid #cbd5e1', paddingBottom: '15px' }}>
+        <h1 style={{ margin: 0, color: '#0f172a', fontSize: '2.5rem' }}>Structural Analysis Engine</h1>
         {isSolved && (
-          <button onClick={() => setIsSolved(false)} style={{ padding: '10px 20px', background: '#64748b', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
-            ← Edit Setup
+          <button onClick={() => setIsSolved(false)} style={{ padding: '12px 24px', fontSize: '18px', background: '#475569', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+            ← Edit Problem Setup
           </button>
         )}
       </div>
 
-      {/* PAGE 1: SETUP MODE */}
       {!isSolved && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '30px', alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 450px', gap: '40px', alignItems: 'start' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-              <h3 style={{ marginTop: 0 }}>Model View</h3>
+            <div style={{ background: '#f8fafc', padding: '30px', borderRadius: '16px', border: '2px solid #e2e8f0' }}>
+              <h2 style={{ marginTop: 0, fontSize: '1.8rem', color: '#1e293b' }}>Model View</h2>
               <BeamSetupView beamLength={beamLength} supportA={supportA} supportB={supportB} pointLoad={pointLoad} momentLoad={momentLoad} distLoad={distLoad} />
             </div>
-
             <button
               onClick={() => setIsSolved(true)}
-              style={{ padding: '20px', fontSize: '20px', background: '#10b981', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+              style={{ padding: '25px', fontSize: '24px', background: '#10b981', color: 'white', border: 'none', borderRadius: '12px', cursor: 'pointer', fontWeight: '900', letterSpacing: '2px', boxShadow: '0 10px 15px -3px rgba(16, 185, 129, 0.4)', transition: 'all 0.2s' }}
             >
-              RUN ANALYSIS (SOLVE)
+              RUN ANALYSIS
             </button>
           </div>
 
           <ControlPanel
             beamLength={beamLength} setBeamLength={setBeamLength}
-            supportA={supportA} setSupportA={setSupportA}
-            supportB={supportB} setSupportB={setSupportB}
-            reactions={reactions}
-            pointLoad={pointLoad} setPointLoad={setPointLoad}
-            momentLoad={momentLoad} setMomentLoad={setMomentLoad}
-            distLoad={distLoad} setDistLoad={setDistLoad}
-            material={material} setMaterial={setMaterial}
-            section={section} setSection={setSection}
+            supportA={supportA} setSupportA={setSupportA} supportB={supportB} setSupportB={setSupportB}
+            reactions={reactions} pointLoad={pointLoad} setPointLoad={setPointLoad}
+            momentLoad={momentLoad} setMomentLoad={setMomentLoad} distLoad={distLoad} setDistLoad={setDistLoad}
+            material={material} setMaterial={setMaterial} section={section} setSection={setSection}
           />
         </div>
       )}
 
-      {/* PAGE 2: RESULTS MODE */}
       {isSolved && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '30px', alignItems: 'start' }}>
-
-          {/* Left Column: Stacked visuals */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', background: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-            <h3 style={{ margin: 0, textAlign: 'center', color: '#475569' }}>Analysis Projections</h3>
-
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 450px', gap: '40px', alignItems: 'start' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', background: '#f8fafc', padding: '30px', borderRadius: '16px', border: '2px solid #e2e8f0' }}>
+            <h2 style={{ margin: 0, textAlign: 'center', color: '#1e293b', fontSize: '1.8rem' }}>Analysis Projections</h2>
             <BeamSetupView beamLength={beamLength} supportA={supportA} supportB={supportB} pointLoad={pointLoad} momentLoad={momentLoad} distLoad={distLoad} />
-
-            <div style={{ borderTop: '2px dashed #cbd5e1', paddingTop: '15px' }}>
-              <ChartSFD data={plotData} />
-            </div>
-            <div style={{ borderTop: '2px dashed #cbd5e1', paddingTop: '15px' }}>
-              <ChartBMD data={plotData} />
-            </div>
-            <div style={{ borderTop: '2px dashed #cbd5e1', paddingTop: '15px' }}>
-              <ChartDeflection data={plotData} />
-            </div>
+            <div style={{ borderTop: '3px dashed #cbd5e1', paddingTop: '20px' }}><ChartSFD data={plotData} /></div>
+            <div style={{ borderTop: '3px dashed #cbd5e1', paddingTop: '20px' }}><ChartBMD data={plotData} /></div>
+            <div style={{ borderTop: '3px dashed #cbd5e1', paddingTop: '20px' }}><ChartDeflection data={plotData} /></div>
           </div>
-
-          {/* Right Column: Summary table and stress profile */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
             <ResultsTable reactions={reactions} peakValues={peakValues} material={material} section={section} />
             <StressProfileView moment={peakValues.moment} section={section} />
           </div>
-
         </div>
       )}
-
     </div>
   );
 }
