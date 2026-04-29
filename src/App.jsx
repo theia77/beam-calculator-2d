@@ -21,21 +21,22 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 // ─── Auth Wrapper ────────────────────────────────────────────────────────────
 export default function App() {
-  const [session, setSession] = useState(null);
+  const [session, setSession] = useState(undefined);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      setSession(session ?? null);
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  if (session === undefined) return null;
 
   if (!session) {
     return (
       <div style={{ maxWidth: '400px', margin: '100px auto', padding: '30px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Structural Analysis Engine</h2>
-        <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} providers={['google']} />
+        <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} providers={['google']} redirectTo={window.location.origin} />
       </div>
     );
   }
