@@ -82,6 +82,12 @@ export function solveFEA(nodes, elements, supports, nodalLoads) {
   let displacements;
   try {
     displacements = multiply(inv(matrix(K_global)), matrix(F_global)).toArray();
+
+    // Catch floating-point mechanisms: matrix "inverted" but displacements are astronomically huge
+    const maxDisp = Math.max(...displacements.map(Math.abs));
+    if (maxDisp > 1e6) {
+      return { error: 'Structure is unstable (Mechanism detected). It will collapse under load.' };
+    }
   } catch (err) {
     return { error: 'Matrix is singular (Structure is unstable)' };
   }

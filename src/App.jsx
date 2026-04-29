@@ -415,7 +415,7 @@ function MatrixFEATab() {
     { id: 'e1', node1: 'n1', node2: 'n2', L: 5, E: 200e6, I: 0.0001, hinge: 'none' },
     { id: 'e2', node1: 'n2', node2: 'n3', L: 5, E: 200e6, I: 0.0001, hinge: 'left' },
   ];
-  const supports   = [{ nodeId: 'n1', type: 'pin' }, { nodeId: 'n3', type: 'roller' }];
+  const supports   = [{ nodeId: 'n1', type: 'fixed' }, { nodeId: 'n3', type: 'roller' }];
   const nodalLoads = [{ nodeId: 'n2', Fy: -50, M: 0 }];
   const result = useMemo(() => solveFEA(nodes, elements, supports, nodalLoads), []);
 
