@@ -1,6 +1,6 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 
-export default function ChartSFD({ data }) {
+export default function ChartSFD({ data, beamLength }) {
   const shearValues = data.map(d => d.shear);
   const maxPositive = Math.max(...shearValues);
   const maxNegative = Math.min(...shearValues);
@@ -18,7 +18,7 @@ export default function ChartSFD({ data }) {
         <ResponsiveContainer>
           <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" opacity={0.5} />
-            <XAxis dataKey="x" type="number" domain={[0, 10]} />
+            <XAxis dataKey="x" type="number" domain={[0, beamLength ?? 'dataMax']} />
             <YAxis />
             <Tooltip />
             <ReferenceLine y={0} stroke="#000" />
