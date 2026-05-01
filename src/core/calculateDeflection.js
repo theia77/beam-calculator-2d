@@ -1,4 +1,14 @@
-export function calculateDeflection(momentData, E, I) {
+function interpolate(xs, values, targetX) {
+  for (let i = 0; i < xs.length - 1; i++) {
+    if (xs[i] <= targetX && targetX <= xs[i + 1]) {
+      const t = (targetX - xs[i]) / (xs[i + 1] - xs[i]);
+      return values[i] + t * (values[i + 1] - values[i]);
+    }
+  }
+  return values[values.length - 1];
+}
+
+export function calculateDeflection(momentData, E, I, xA, xB) {
   const steps = momentData.length;
   const beamLength = momentData[steps - 1].x;
   const dx = beamLength / (steps - 1);
@@ -18,13 +28,18 @@ export function calculateDeflection(momentData, E, I) {
     deflectionValues[i] = deflectionValues[i - 1] + avgSlope * dx;
   }
 
-  // Boundary condition: deflection at B = 0 (simply supported)
-  const deflectionAtB = deflectionValues[steps - 1];
-  const slopeCorrection = deflectionAtB / beamLength;
+  // Boundary conditions: y(xA) = 0 and y(xB) = 0
+  // Solve for integration constants C1, C2 in: Y_corrected(x) = Y_raw(x) + C1*x + C2
+  const xs = momentData.map(d => d.x);
+  const Y_at_xA = interpolate(xs, deflectionValues, xA);
+  const Y_at_xB = interpolate(xs, deflectionValues, xB);
+  const span = xB - xA;
+  const C1 = -(Y_at_xB - Y_at_xA) / span;
+  const C2 = -Y_at_xA - C1 * xA;
 
   return momentData.map((d, i) => {
-    const cSlope = slopeValues[i] - slopeCorrection;
-    const cDeflection = deflectionValues[i] - slopeCorrection * d.x;
+    const cDeflection = deflectionValues[i] + C1 * d.x + C2;
+    const cSlope = slopeValues[i] + C1;
 
     return {
       x: d.x,

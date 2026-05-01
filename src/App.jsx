@@ -221,7 +221,7 @@ function Workspace({ userId }) {
           moment:     getPeak('moment'),
           deflection: getPeak('deflection'),
           slope:      getPeak('slope'),
-          stress:     Math.max(...result.plotData.map(d => d.stress)),
+          stress:     getPeak('stress'),
         },
         ildData: ild,
         analysisError: null,

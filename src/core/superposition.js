@@ -14,7 +14,7 @@ export function generatePlotData(beamLength, loads, xA, xB, material, section) {
     basicData.push({ x, shear, moment });
   }
 
-  const deflectionData = calculateDeflection(basicData, material.e_kn_m2, section.i_m4);
+  const deflectionData = calculateDeflection(basicData, material.e_kn_m2, section.i_m4, xA, xB);
 
   const plotData = deflectionData.map(d => {
     const stressKpa = (d.moment * section.ymax_m) / section.i_m4;

@@ -49,7 +49,7 @@ export default function ResultsTable({ reactions, peakValues, material, section 
           <strong>{material.fy_mpa} MPa</strong>
         </div>
 
-        {peakValues.stress > material.fy_mpa ? (
+        {Math.abs(peakValues.stress) > material.fy_mpa ? (
           <div style={{ marginTop: '10px', padding: '8px', background: '#fee2e2', color: '#b91c1c', textAlign: 'center', borderRadius: '4px', fontWeight: 'bold' }}>
             WARNING: Section Fails (Yield Exceeded)
           </div>
