@@ -18,6 +18,11 @@ export default function App() {
   const [authError, setAuthError] = useState(null);
 
   useEffect(() => {
+    // Always subscribe first so auth state changes are never missed
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session ?? null);
+    });
+
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
     const errorParam = params.get('error');
@@ -27,26 +32,28 @@ export default function App() {
       setAuthError(errorDesc || errorParam);
       window.history.replaceState({}, document.title, '/');
       setSession(null);
-      return;
-    }
-
-    if (code) {
+    } else if (code) {
       supabase.auth.exchangeCodeForSession(window.location.href).then(({ data, error }) => {
         if (error) { setAuthError(error.message); setSession(null); }
         else setSession(data.session);
         window.history.replaceState({}, document.title, '/');
       });
-      return;
+    } else {
+      supabase.auth.getSession().then(({ data: { session } }) => setSession(session ?? null));
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => setSession(session ?? null));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session ?? null);
-    });
     return () => subscription.unsubscribe();
   }, []);
 
-  if (session === undefined) return null;
+  if (session === undefined) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f1f5f9', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ width: '40px', height: '40px', border: '4px solid #cbd5e1', borderTopColor: '#2563eb', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        <span style={{ color: '#64748b', fontSize: '15px' }}>Loading…</span>
+      </div>
+    );
+  }
 
   if (!session) {
     return (
