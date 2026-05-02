@@ -18,15 +18,20 @@ export default function App() {
   const [authError, setAuthError] = useState(null);
 
   useEffect(() => {
-    // Always subscribe first so auth state changes are never missed
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session ?? null);
-    });
-
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
     const errorParam = params.get('error');
     const errorDesc = params.get('error_description');
+
+    // Suppress the initial null-session fire from onAuthStateChange while a
+    // PKCE code exchange is in flight — prevents a momentary login-screen flash.
+    let codeExchangeInProgress = !!code;
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, sess) => {
+      if (codeExchangeInProgress && !sess) return;
+      codeExchangeInProgress = false;
+      setSession(sess ?? null);
+    });
 
     if (errorParam) {
       setAuthError(errorDesc || errorParam);
@@ -34,8 +39,9 @@ export default function App() {
       setSession(null);
     } else if (code) {
       supabase.auth.exchangeCodeForSession(window.location.href).then(({ data, error }) => {
+        codeExchangeInProgress = false;
         if (error) { setAuthError(error.message); setSession(null); }
-        else setSession(data.session);
+        // On success, onAuthStateChange SIGNED_IN event already set the session.
         window.history.replaceState({}, document.title, '/');
       });
     } else {
@@ -115,9 +121,17 @@ function Workspace({ userId }) {
   const [saving,      setSaving]      = useState(false);
   const [saveMsg,     setSaveMsg]     = useState(null);
   const [nameEditing, setNameEditing] = useState(false);
+  const [isDirty,     setIsDirty]     = useState(false);
   const nameRef = useRef(null);
 
   useEffect(() => { fetchProjects(); }, []);
+
+  // Mark project dirty whenever beam state changes after initial mount
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    if (!mountedRef.current) { mountedRef.current = true; return; }
+    setIsDirty(true);
+  }, [beamLength, supportA, supportB, loads, material, section]);
 
   async function fetchProjects() {
     const { data, error } = await supabase
@@ -154,6 +168,7 @@ function Workspace({ userId }) {
       if (!error) setCurrentId(data.id);
     }
     setSaving(false);
+    if (!error) setIsDirty(false);
     setSaveMsg(error ? 'Save failed' : 'Saved!');
     setTimeout(() => setSaveMsg(null), 2000);
     fetchProjects();
@@ -165,6 +180,7 @@ function Workspace({ userId }) {
       applyState(data);
       setCurrentId(data.id);
       setCurrentName(data.name);
+      setIsDirty(false);
       setShowPanel(false);
     }
   }
@@ -180,15 +196,27 @@ function Workspace({ userId }) {
     applyState(BLANK);
     setCurrentId(null);
     setCurrentName('Untitled Project');
+    setIsDirty(false);
     setShowPanel(false);
   }
 
   // ── Analysis computation ──────────────────────────────────────────────────
   const { plotData, reactions, peakValues, ildData, analysisError } = useMemo(() => {
-    if (beamLength <= 0)     return { analysisError: 'Beam length must be greater than zero.' };
-    if (supportA < 0)        return { analysisError: 'Support A cannot be at a negative position.' };
+    if (beamLength <= 0)      return { analysisError: 'Beam length must be greater than zero.' };
+    if (supportA < 0)         return { analysisError: 'Support A cannot be at a negative position.' };
     if (supportB <= supportA) return { analysisError: 'Support B must be to the right of Support A.' };
     if (supportB > beamLength) return { analysisError: 'Support B cannot be beyond the end of the beam.' };
+
+    for (const load of loads) {
+      if (load.type === 'point' || load.type === 'moment') {
+        if (load.pos < 0 || load.pos > beamLength)
+          return { analysisError: `A ${load.type} load is positioned outside the beam (${load.pos} m). Move it within [0, ${beamLength} m].` };
+      }
+      if (load.type === 'distributed') {
+        if (load.startPos < 0 || load.endPos > beamLength || load.startPos >= load.endPos)
+          return { analysisError: `A distributed load has invalid extents (${load.startPos}–${load.endPos} m). Must be within [0, ${beamLength} m] with start < end.` };
+      }
+    }
 
     try {
       const activeLoads = loads.map(load => {
@@ -264,7 +292,8 @@ function Workspace({ userId }) {
               {currentName}
             </span>
           )}
-          {currentId && <span style={{ fontSize: '11px', color: '#94a3b8' }}>saved</span>}
+          {currentId && !isDirty && <span style={{ fontSize: '11px', color: '#94a3b8' }}>saved</span>}
+          {currentId && isDirty  && <span style={{ fontSize: '11px', color: '#f59e0b' }}>unsaved changes</span>}
         </div>
 
         {saveMsg && <span style={{ fontSize: '13px', fontWeight: 600, color: saveMsg === 'Saved!' ? '#10b981' : '#ef4444' }}>{saveMsg}</span>}
@@ -368,7 +397,7 @@ function Workspace({ userId }) {
               <ChartBMD data={plotData} beamLength={beamLength} />
             </div>
             <div style={{ borderTop: '2px solid #f1f5f9', paddingTop: '20px' }}>
-              <ChartDeflection data={plotData} />
+              <ChartDeflection data={plotData} beamLength={beamLength} />
             </div>
 
             {/* ILD ── Analytical */}

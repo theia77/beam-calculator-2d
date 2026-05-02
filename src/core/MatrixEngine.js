@@ -52,7 +52,9 @@ export function solveFEA(nodes, elements, supports, nodalLoads) {
     }
   });
 
-  const K_pure = matrix(K_global);
+  // Deep-copy before BCs: mathjs matrix() stores a reference, so penalty
+  // modifications below would silently corrupt K_pure without this copy.
+  const K_pure = matrix(K_global.map(row => [...row]));
 
   // Apply Nodal Loads
   nodalLoads.forEach(load => {

@@ -6,11 +6,11 @@ export function generatePlotData(beamLength, loads, xA, xB, material, section) {
   const dx = beamLength / steps;
   const basicData = [];
 
-  const { rA, rB } = solveReactions(beamLength, loads, xA, xB);
+  const { rA, rB } = solveReactions(loads, xA, xB);
 
   for (let i = 0; i <= steps; i++) {
     const x = Math.round((i * dx) * 1000) / 1000;
-    const { shear, moment } = calculateInternalForces(x, beamLength, loads, xA, xB, rA, rB);
+    const { shear, moment } = calculateInternalForces(x, loads, xA, xB, rA, rB);
     basicData.push({ x, shear, moment });
   }
 
@@ -23,10 +23,11 @@ export function generatePlotData(beamLength, loads, xA, xB, material, section) {
 
     return {
       ...d,
-      shear: Math.round(d.shear * 100) / 100,
-      moment: Math.round(d.moment * 100) / 100,
-      deflection: Math.round(d.deflection * 100) / 100,
-      stress: Math.round(stressMpa * 100) / 100,
+      shear:      Math.round(d.shear      * 100)    / 100,
+      moment:     Math.round(d.moment     * 100)    / 100,
+      deflection: Math.round(d.deflection * 100)    / 100,
+      slope:      Math.round(d.slope      * 1e6)    / 1e6,
+      stress:     Math.round(stressMpa    * 100)    / 100,
       utilization,
     };
   });

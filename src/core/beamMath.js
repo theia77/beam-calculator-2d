@@ -4,7 +4,7 @@ function mac(x, a, power) {
   return Math.pow(x - a, power);
 }
 
-export function solveReactions(L, loads, xA, xB) {
+export function solveReactions(loads, xA, xB) {
   const span = xB - xA;
   if (span === 0) return { rA: 0, rB: 0 };
 
@@ -48,7 +48,7 @@ export function solveReactions(L, loads, xA, xB) {
   return { rA, rB };
 }
 
-export function calculateInternalForces(x, L, loads, xA, xB, rA, rB) {
+export function calculateInternalForces(x, loads, xA, xB, rA, rB) {
   let shear = rA * mac(x, xA, 0) + rB * mac(x, xB, 0);
   let moment = rA * mac(x, xA, 1) + rB * mac(x, xB, 1);
 

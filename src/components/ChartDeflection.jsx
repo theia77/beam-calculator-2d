@@ -1,6 +1,6 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 
-export default function ChartDeflection({ data }) {
+export default function ChartDeflection({ data, beamLength }) {
   const values = data.map(d => d.deflection);
   const peak = Math.max(Math.abs(Math.max(...values)), Math.abs(Math.min(...values)));
 
@@ -16,7 +16,7 @@ export default function ChartDeflection({ data }) {
         <ResponsiveContainer>
           <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" opacity={0.5} />
-            <XAxis dataKey="x" type="number" domain={[0, 'dataMax']} />
+            <XAxis dataKey="x" type="number" domain={[0, beamLength ?? 'dataMax']} />
             <YAxis unit=" mm" />
             <Tooltip formatter={(v) => [`${v} mm`, 'Deflection']} />
             <ReferenceLine y={0} stroke="#000" />
