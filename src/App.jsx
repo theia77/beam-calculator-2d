@@ -9,6 +9,7 @@ import ChartSFD from './components/ChartSFD';
 import ChartBMD from './components/ChartBMD';
 import ChartDeflection from './components/ChartDeflection';
 import ResultsTable from './components/ResultsTable';
+import Beam3DScene from './components/Beam3DScene';
 import { generatePlotData } from './core/superposition';
 import { materials, sections } from './core/beamData';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
@@ -280,6 +281,41 @@ function Workspace({ session, theme, setTheme }) {
     }
   }, [beamLength, supportA, supportB, loads, material, section]);
 
+  // ── 3D adapter: convert beam state → Beam3DScene props ────────────────────
+  const beam3DState = useMemo(() => {
+    // Use plotData points as nodes for a smooth deformed shape (150 pts).
+    // Fall back to 4 key positions when analysis hasn't run yet.
+    const tol = Math.max(beamLength * 0.005, 0.01)
+    const points = plotData ?? [
+      { x: 0 },
+      { x: supportA },
+      { x: supportB },
+      { x: beamLength },
+    ]
+
+    const nodes = points.map((p, i) => ({
+      id: i,
+      x: p.x,
+      y: 0,
+      supportType:
+        Math.abs(p.x - supportA) < tol ? 'pinned' :
+        Math.abs(p.x - supportB) < tol ? 'roller' : 'free',
+    }))
+
+    const elements = nodes.slice(0, -1).map((_, i) => ({
+      startNodeId: i,
+      endNodeId: i + 1,
+    }))
+
+    return { nodes, elements }
+  }, [plotData, supportA, supportB, beamLength])
+
+  const beam3DResults = useMemo(() => ({
+    displacements: (isSolved && plotData)
+      ? plotData.map(p => ({ dx: 0, dy: p.deflection / 1000 })) // mm → m
+      : null,
+  }), [isSolved, plotData])
+
   const cardStyle = {
     background: 'var(--bg-surface)',
     padding: '24px',
@@ -336,13 +372,7 @@ function Workspace({ session, theme, setTheme }) {
           {/* Canvas area */}
           <div className="canvas-area">
             {viewMode === '3D' ? (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', gap: '16px', textAlign: 'center' }}>
-                <div style={{ fontSize: '64px', lineHeight: 1 }}>🏗️</div>
-                <div>
-                  <p style={{ margin: '0 0 6px 0', fontSize: '16px', fontWeight: 600, color: 'var(--text-secondary)' }}>3D Environment</p>
-                  <p style={{ margin: 0, fontSize: '13px' }}>React Three Fiber integration coming soon</p>
-                </div>
-              </div>
+              <Beam3DScene state={beam3DState} results={beam3DResults} />
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
