@@ -315,20 +315,22 @@ function Workspace({ session, theme, setTheme }) {
         {/* ── LEFT PANEL ───────────────────────────────────────────────────── */}
         <div className="left-panel">
 
-          {/* Tab bar */}
+          {/* Tab bar — Shadcn pill style */}
           <div className="tab-bar">
-            <button
-              className={`tab-btn${viewMode === '2D' ? ' active' : ''}`}
-              onClick={() => setViewMode('2D')}
-            >
-              2D Diagrams (SFD / BMD)
-            </button>
-            <button
-              className={`tab-btn${viewMode === '3D' ? ' active' : ''}`}
-              onClick={() => setViewMode('3D')}
-            >
-              3D Environment
-            </button>
+            <div className="tab-list">
+              <button
+                className={`tab-btn${viewMode === '2D' ? ' active' : ''}`}
+                onClick={() => setViewMode('2D')}
+              >
+                2D Diagrams (SFD / BMD)
+              </button>
+              <button
+                className={`tab-btn${viewMode === '3D' ? ' active' : ''}`}
+                onClick={() => setViewMode('3D')}
+              >
+                3D Environment
+              </button>
+            </div>
           </div>
 
           {/* Canvas area */}

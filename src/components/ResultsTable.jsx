@@ -1,63 +1,91 @@
-import React from 'react';
-
 export default function ResultsTable({ reactions, peakValues, material, section }) {
-  const rowStyle = { padding: '12px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between' };
+  const rowStyle = {
+    padding: '11px 16px',
+    borderBottom: '1px solid var(--border)',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    fontSize: '13px',
+  };
+
+  const yieldExceeded = Math.abs(peakValues.stress) > material.fy_mpa;
 
   return (
-    <div style={{ background: 'white', borderRadius: '8px', border: '1px solid #cbd5e1', overflow: 'hidden' }}>
-      <div style={{ background: '#1e293b', color: 'white', padding: '12px', fontWeight: 'bold', textAlign: 'center' }}>
+    <div style={{ background: 'var(--bg-surface)', borderRadius: '10px', border: '1px solid var(--border)', overflow: 'hidden' }}>
+
+      {/* Header */}
+      <div style={{ background: '#1e293b', color: 'white', padding: '12px 16px', fontWeight: 700, fontSize: '13px', letterSpacing: '0.4px', textAlign: 'center' }}>
         Analysis Summary
       </div>
 
-      <div style={{ padding: '15px', background: '#f8fafc', borderBottom: '2px solid #cbd5e1' }}>
-        <h4 style={{ margin: '0 0 10px 0', color: '#475569' }}>Support Reactions</h4>
-        <div style={{ display: 'flex', justifyContent: 'space-around', fontSize: '18px', fontWeight: 'bold' }}>
-          <span style={{ color: '#0ea5e9' }}>R<sub>A</sub>: {reactions.rA.toFixed(2)} kN</span>
-          <span style={{ color: '#0ea5e9' }}>R<sub>B</sub>: {reactions.rB.toFixed(2)} kN</span>
+      {/* Reactions */}
+      <div style={{ padding: '14px 16px', background: 'var(--reactions-bg)', borderBottom: '1px solid var(--border-strong)' }}>
+        <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px' }}>
+          Support Reactions
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#0ea5e9' }}>
+              {reactions.rA.toFixed(2)} kN
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>R<sub>A</sub></div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#0ea5e9' }}>
+              {reactions.rB.toFixed(2)} kN
+            </div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>R<sub>B</sub></div>
+          </div>
         </div>
       </div>
 
+      {/* Peak values */}
       <div>
         <div style={rowStyle}>
-          <span style={{ color: '#64748b' }}>Peak Shear Force (V)</span>
-          <span style={{ fontWeight: 'bold' }}>{peakValues.shear.toFixed(2)} kN</span>
+          <span style={{ color: 'var(--text-muted)' }}>Peak Shear (V)</span>
+          <strong style={{ color: 'var(--text-primary)' }}>{peakValues.shear.toFixed(2)} kN</strong>
         </div>
         <div style={rowStyle}>
-          <span style={{ color: '#64748b' }}>Peak Bending Moment (M)</span>
-          <span style={{ fontWeight: 'bold' }}>{peakValues.moment.toFixed(2)} kN·m</span>
+          <span style={{ color: 'var(--text-muted)' }}>Peak Moment (M)</span>
+          <strong style={{ color: 'var(--text-primary)' }}>{peakValues.moment.toFixed(2)} kN·m</strong>
         </div>
         <div style={rowStyle}>
-          <span style={{ color: '#64748b' }}>Maximum Deflection (Δ)</span>
-          <span style={{ fontWeight: 'bold', color: Math.abs(peakValues.deflection) > 25 ? '#ef4444' : 'inherit' }}>
+          <span style={{ color: 'var(--text-muted)' }}>Max Deflection (Δ)</span>
+          <strong style={{ color: Math.abs(peakValues.deflection) > 25 ? '#ef4444' : 'var(--text-primary)' }}>
             {peakValues.deflection.toFixed(2)} mm
-          </span>
+          </strong>
         </div>
-        <div style={rowStyle}>
-          <span style={{ color: '#64748b' }}>Maximum Rotation (θ)</span>
-          <span style={{ fontWeight: 'bold' }}>{peakValues.slope.toFixed(4)} rad</span>
+        <div style={{ ...rowStyle, borderBottom: 'none' }}>
+          <span style={{ color: 'var(--text-muted)' }}>Max Rotation (θ)</span>
+          <strong style={{ color: 'var(--text-primary)' }}>{peakValues.slope.toFixed(4)} rad</strong>
         </div>
       </div>
 
-      <div style={{ padding: '15px', background: '#f0fdf4', borderTop: '2px solid #cbd5e1' }}>
-        <h4 style={{ margin: '0 0 10px 0', color: '#16a34a' }}>Design Checks</h4>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-          <span>Max Bending Stress:</span>
-          <strong>{peakValues.stress.toFixed(1)} MPa</strong>
+      {/* Design checks */}
+      <div style={{ padding: '14px 16px', background: 'var(--reactions-bg)', borderTop: '1px solid var(--border-strong)' }}>
+        <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px' }}>
+          Design Check
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span>Material Yield ({material.label}):</span>
-          <strong>{material.fy_mpa} MPa</strong>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '13px' }}>
+          <span style={{ color: 'var(--text-secondary)' }}>Bending Stress:</span>
+          <strong style={{ color: 'var(--text-primary)' }}>{peakValues.stress.toFixed(1)} MPa</strong>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '13px' }}>
+          <span style={{ color: 'var(--text-secondary)' }}>Yield ({material.label}):</span>
+          <strong style={{ color: 'var(--text-primary)' }}>{material.fy_mpa} MPa</strong>
         </div>
 
-        {Math.abs(peakValues.stress) > material.fy_mpa ? (
-          <div style={{ marginTop: '10px', padding: '8px', background: '#fee2e2', color: '#b91c1c', textAlign: 'center', borderRadius: '4px', fontWeight: 'bold' }}>
-            WARNING: Section Fails (Yield Exceeded)
-          </div>
-        ) : (
-          <div style={{ marginTop: '10px', padding: '8px', background: '#dcfce7', color: '#15803d', textAlign: 'center', borderRadius: '4px', fontWeight: 'bold' }}>
-            PASS: Section is Safe
-          </div>
-        )}
+        <div style={{
+          padding: '9px 12px',
+          background: yieldExceeded ? 'var(--check-fail-bg)' : 'var(--check-pass-bg)',
+          color: yieldExceeded ? 'var(--check-fail-text)' : 'var(--check-pass-text)',
+          textAlign: 'center',
+          borderRadius: '6px',
+          fontWeight: 700,
+          fontSize: '13px',
+        }}>
+          {yieldExceeded ? '⚠ Section Fails — Yield Exceeded' : '✓ Section is Safe'}
+        </div>
       </div>
     </div>
   );

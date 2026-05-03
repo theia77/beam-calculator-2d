@@ -1,26 +1,40 @@
 /* ── Theme tokens ─────────────────────────────────────────────────────────── */
 :root {
-  --bg-base:      #f1f5f9;
-  --bg-surface:   #ffffff;
-  --bg-surface-2: #f8fafc;
-  --border:       #e2e8f0;
-  --border-strong:#cbd5e1;
-  --text-primary: #1e293b;
-  --text-secondary:#475569;
-  --text-muted:   #64748b;
-  --text-subtle:  #94a3b8;
+  --bg-base:        #f1f5f9;
+  --bg-surface:     #ffffff;
+  --bg-surface-2:   #f8fafc;
+  --border:         #e2e8f0;
+  --border-strong:  #cbd5e1;
+  --text-primary:   #1e293b;
+  --text-secondary: #475569;
+  --text-muted:     #64748b;
+  --text-subtle:    #94a3b8;
+  --input-bg:       #ffffff;
+  --input-border:   #cbd5e1;
+  --check-pass-bg:  #f0fdf4;
+  --check-pass-text:#16a34a;
+  --check-fail-bg:  #fee2e2;
+  --check-fail-text:#b91c1c;
+  --reactions-bg:   #f8fafc;
 }
 
 html.dark {
-  --bg-base:      #0f172a;
-  --bg-surface:   #1e293b;
-  --bg-surface-2: #0f172a;
-  --border:       #334155;
-  --border-strong:#475569;
-  --text-primary: #f1f5f9;
-  --text-secondary:#cbd5e1;
-  --text-muted:   #94a3b8;
-  --text-subtle:  #64748b;
+  --bg-base:        #0f172a;
+  --bg-surface:     #1e293b;
+  --bg-surface-2:   #0f172a;
+  --border:         #334155;
+  --border-strong:  #475569;
+  --text-primary:   #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted:     #94a3b8;
+  --text-subtle:    #64748b;
+  --input-bg:       #0f172a;
+  --input-border:   #475569;
+  --check-pass-bg:  rgba(22,163,74,0.12);
+  --check-pass-text:#4ade80;
+  --check-fail-bg:  rgba(239,68,68,0.12);
+  --check-fail-text:#f87171;
+  --reactions-bg:   #0f172a;
 }
 
 /* ── Reset ────────────────────────────────────────────────────────────────── */
@@ -157,29 +171,40 @@ html.dark .app-header {
   background: var(--bg-surface);
 }
 
-/* ── Tab Bar ──────────────────────────────────────────────────────────────── */
+/* ── Tab Bar — Shadcn pill style ──────────────────────────────────────────── */
 .tab-bar {
   display: flex;
+  align-items: center;
+  padding: 10px 16px;
   border-bottom: 1px solid var(--border);
   background: var(--bg-surface);
   flex-shrink: 0;
-  padding: 0 16px;
-  gap: 0;
 }
 
+/* The pill container (Shadcn TabsList equivalent) */
+.tab-list {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-base);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+
+/* Individual tab button (Shadcn TabsTrigger equivalent) */
 .tab-btn {
-  padding: 14px 20px;
-  background: none;
+  padding: 6px 16px;
+  background: transparent;
   border: none;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
+  border-radius: 6px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-muted);
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
   white-space: nowrap;
   font-family: inherit;
+  line-height: 1.5;
 }
 
 .tab-btn:hover {
@@ -187,8 +212,10 @@ html.dark .app-header {
 }
 
 .tab-btn.active {
-  color: #2563eb;
-  border-bottom-color: #2563eb;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06);
+  font-weight: 600;
 }
 
 /* ── Canvas Area (left panel content) ────────────────────────────────────── */
@@ -208,4 +235,26 @@ html.dark .app-header {
   background: var(--bg-surface);
   position: relative;
   flex-wrap: nowrap;
+}
+
+/* ── Inputs (global dark-mode fix) ───────────────────────────────────────── */
+input[type="number"],
+input[type="text"],
+select {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border-color: var(--input-border);
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus,
+select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+
+option {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
 }
